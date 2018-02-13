@@ -1,6 +1,6 @@
 @isTest
 Public Class WK_JunkRemovalControllerTest{
-    
+    //HJ Comment
     public static testMethod void controllerTest(){
         
         String aliasString = 'testred';
