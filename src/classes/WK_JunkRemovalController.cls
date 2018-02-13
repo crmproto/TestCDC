@@ -3,7 +3,7 @@
  * Author: Anush Shivanna (Anush)
  * Date:   `25/07/2017
  * Detail: Class to create WorkOrder and WOLI on Portal.
-/******Sucheta Comment ***********/
+/******Suchet Comment ***********/
 *****************************************************************************/
 global without sharing class WK_JunkRemovalController {
 
