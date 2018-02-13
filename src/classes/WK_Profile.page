@@ -1,0 +1,428 @@
+<apex:page docType="html-5.0" showHeader="false" standardStylesheets="false" sidebar="false" controller="WK_ProfilePropertyContactController" >
+    <head>
+      <meta name="viewport" content="initial-scale=1.0" />
+    <meta name="description" content="Wellkept Dashboard" />
+    <title>Profile | Wellkept</title>
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:300,400,600,700" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css?family=Merriweather:300,400,700,900" rel="stylesheet" />
+    <apex:stylesheet value="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"/>
+    <apex:stylesheet value="{!URLFOR($Resource.wkresources, 'js/c3/c3.min.css')}"/>   
+    <apex:stylesheet value="{!URLFOR($Resource.wkresources, 'js/swiper/dist/css/swiper.min.css')}"/>
+    <apex:stylesheet value="{!URLFOR($Resource.wkresources, 'css/main.css')}"/>
+        
+    <apex:includeScript value="{!URLFOR($Resource.wkresources, 'js/jquery.min.js')}"  />   
+    <apex:includeScript value="{!URLFOR($Resource.wkresources, 'js/bootstrap/dist/js/bootstrap.min.js')}"  />
+    <apex:includeScript value="{!URLFOR($Resource.wkresources, 'js/jquery.nice-select.min.js')}" />
+    <apex:includeScript value="{!URLFOR($Resource.wkresources, 'js/swiper/dist/js/swiper.min.js')}" />
+    <apex:includeScript value="{!URLFOR($Resource.wkresources, 'js/d3/d3.min.js')}"/>
+    <apex:includeScript value="{!URLFOR($Resource.wkresources, 'js/c3/c3.min.js')}" />
+    <apex:includeScript value="{!URLFOR($Resource.wkresources, 'js/jquery.cookie/jquery.cookie.js')}" />
+    <apex:includeScript value="{!URLFOR($Resource.wkresources, 'js/parsleyjs/dist/parsley.min.js')}" />
+    <apex:includeScript value="{!URLFOR($Resource.wkresources, 'js/main.js')}" />
+    <script type="text/javascript">
+        function profileEditPage() {
+           <!-- alert(accountId);-->
+            callProfilePage();
+          <!--   alert(accountId); -->
+        }
+        function createContactPage() {
+            callCreateContactPage('{!accountId}');
+        }
+        function contactEditPage(contctId,accountId) {
+            //alert('contact id - > '+contctId);
+            // var cntId =contctId;
+            if(contctId != null && contctId !=''){
+            callcontactEditPageAF(contctId,accountId);
+          }
+        }
+        
+        $( document ).ready(function() {
+        
+              $('#editFine').on('click', function() {
+           // var editFine='{!accDefaultFineAmount}';
+           var editFine = $('#monthlyfine')[0].innerHTML;
+            $('.update-fine').val(editFine);          
+             
+   
+        });
+                 
+          $('#fineSave').on('click', function() {
+            var updatedFine = $('.update-fine').val();
+            console.log(updatedFine);
+            console.log(updatedFine != null);
+            console.log(updatedFine != '');
+            if(updatedFine != null && updatedFine != '') {
+              console.log('entered');
+              updateDefaultFineAmount(updatedFine);
+            }
+          });
+        
+  });    
+        
+    </script>
+    <style>
+    
+    .Ptitle{
+        font-weight:600;
+    }
+    .preferences h2 {
+     color: #003660;
+    }
+    .preferences-section-liner{
+        padding-left :30px !important;
+    }
+     .anchorEdit{
+    font-size: 12px;
+    font-family: Montserrat;
+    font-weight: normal;
+    color: #00adef;
+    }
+      .modal-content .section-liner h3{
+        font-family: Merriweather;
+        font-size: 24px;}
+    @media screen and (min-width: 96px) and (max-width : 906px){
+       .editMobile{
+         display:none;  
+       } 
+       .preferences .edit-icon {
+         display:block;
+       }
+         .noProfileImg{
+           text-align:center; /*9808 Priyanka*/
+       }
+     
+    }
+ 
+      .mrgLeft{
+       margin-left: -11px;
+       }
+       
+   
+        .preferences section .preferences-section-liner .contact-title {
+      font-size:16px;
+    }
+    .label {
+    font-size:16px;
+    }
+    .value {
+     font-size:16px;
+    }
+    
+    </style>
+ </head>
+    <body>
+    <!--header start-->
+    <!-- DE9760 --> 
+    <c:WK_HeaderComponent title="{!$Label.WK_ProfileLabel}"></c:WK_HeaderComponent>
+  <!-- End Sub Header -->
+  <apex:form id="formId" >
+  <div class="container preferences">
+    <div class="col-md-10 col-md-offset-1">
+      <div class="page-header">
+        <h1 class="">
+          Preferences
+        </h1>
+      </div>
+      
+     
+
+     <div class="swiper-mobile">
+
+       <div class="custom-pagination swiper-pagination visible-xs visible-sm"></div>
+
+         <div class="swiper-wrapper">
+          <section class="profile-section swiper-slide">
+            <div class="section-header">
+              <h2>
+                Profile
+                <!--<a href="edit-profile.html" onclick="profileEditPage();return false;">-->
+              <!--  <apex:repeat value="{!accWrapperList}" var="acc"> -->
+                   <apex:commandLink onclick="profileEditPage();return false;" styleClass="anchorEdit">
+                    <img class="edit-icon pr-5" type="image/svg+xml" src="{!URLFOR($Resource.wkresources, 'icons/edit.svg')}" /> EDIT
+                    </apex:commandLink>
+                 <!-- </apex:repeat> -->
+                <!--</a>-->
+                <apex:actionFunction name="callProfilePage" action="{!callProfilePage}">
+                     <!-- <apex:param name="accountId" assignTo="{!accountId}" value=""/> -->
+                  </apex:actionFunction>
+              </h2>
+            </div>
+            <div class="preferences-section-liner">
+              <div class="row">
+                <div class="col-sm-2 pl-0">
+                  <!-- <div class="avatar">
+                      <apex:image url="/servlet/servlet.FileDownload?file={!firstFileId}"/>
+                  </div> -->
+
+                  <div class ="avatar profileImg">
+                  <apex:image width="100%" height="100%" url="/wellkept/servlet/servlet.FileDownload?file={!firstFileId}"/>
+                  </div> 
+                  <div class="noProfileImg">
+                    <img src="{!URLFOR($Resource.wkresources, 'img/NoPrefProfile.png')}" />
+                  </div> 
+
+
+
+                </div>
+                <div class="col-sm-3 pl-80">
+                  <div class="label">
+                    First Name
+                  </div>
+                  <div class="value">
+                   {!loggedInUser.FirstName}
+                  </div>
+                  <div class="label">
+                    Last Name
+                  </div>
+                  <div class="value">
+                    {!loggedInUser.LastName}
+                  </div>
+                </div>
+                <div class="col-sm-3">
+                  <div class="label">
+                    Mobile #
+                  </div>
+                  <div class="value">
+                    {!loggedInUser.MobilePhone}
+                  </div>
+                  <div class="label">
+                    Office #
+                  </div>
+                  <div class="value">
+                    {!loggedInUser.Phone}
+                  </div>
+                </div>
+                <div class="col-sm-4">
+                  <div class="label">
+                    Email
+                  </div>
+                  <div class="value">
+                   {!loggedInUser.email}
+                  </div>
+                  <div class="label">
+                    Violation Email Preferences
+                  </div>
+                  <div class="value">
+                    {!emailPreference}
+                  </div>
+                  <apex:outputText id="emergencyID" styleClass="emergency-contact" rendered="{!userEmergencyCheck}">
+                    Emergency Contact
+                  </apex:outputText> 
+                  <div class="mobile-edit-btn text-center visible-xs visible-sm">
+                  <apex:commandLink onclick="profileEditPage();return false;" styleClass="secondary button-small">
+                 <!--   <a class="secondary button-small" href="edit-profile.html"> -->
+                    Edit
+                <!--  </a> -->
+                  </apex:commandLink>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+          
+           <section class="property-section swiper-slide">
+             <div class="section-header">
+                <h2>
+                  Property
+                </h2>
+              </div>
+            <div class="preferences-section-liner">
+              <div class="row">
+                <div class="col-sm-4">
+                  <div class="label">
+                    Name
+                  </div>
+                  <div class="value">
+                    {!AccName}
+                  </div>
+                  <div class="label">
+                   MANAGEMENT COMPANY
+                  </div>
+                  <div class="value">
+                   {!accParentAccount}
+                  </div>
+                </div>
+                <div class="col-sm-4">
+                  <div class="label">
+                    Address
+                  </div>
+                  <div class="value">
+                      {!accBillingStreet}<br/>{!accBillingCity},<!-- DE9791(Priyanka)-->
+                    {!accBillingState}{!accBillingPostalCode}
+                  </div>
+                </div>
+                <div class="col-sm-4">
+                  <div class="label">
+                    Units
+                  </div>
+                  <div class="value">
+                    {!accUnitTotal}
+                  </div>
+                  <div class="label">
+                 <div class="col-xs-8 pr-0 pl-0"> Default Fine Amount</div>
+                 <div class="col-xs-4 pr-0 pl-0"><a href="#" id="editFine" class="addContactText" data-toggle="modal" data-target=".bs-example-modal-lg" >
+                    <img class=" mb-5 iconHeight" style="width:40px;" type="image/svg+xml" src="{!URLFOR($Resource.wkresources, 'icons/edit.svg')}" /><span class="mrgLeft">EDIT</span></a></div>
+                  </div>
+                  <div class="value">
+                  <apex:outputPanel id="finepanel">
+                    <span>$</span><span id="monthlyfine" class="key-values" data-markup="">{!accDefaultFineAmount}</span> 
+                        
+                  </apex:outputPanel>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+          
+          <section class="contacts-section swiper-slide">
+
+            <div class="container visible-xs visible-sm">
+              <a class="secondary button-small add-new-mobile" href="{!URLFOR($Page.WK_AddContacts)}?Id={!accountId}">
+                Add New
+              </a>
+            </div>
+
+            <div class="section-header">
+              <h2>
+                Contacts
+                <!-- <a href="add-contact.html"> -->
+                <apex:commandLink onclick="createContactPage();return false;" styleClass="addContactText">
+                <img type="image/svg+xml" src="{!URLFOR($Resource.wkresources, 'icons/adduser.svg')}" /> ADD CONTACT
+                </apex:commandLink>
+                  <apex:actionFunction name="callCreateContactPage" action="{!callcontactcreatePage}">
+                    <apex:param name="accountId" assignTo="{!accountId}" value=""/>
+                      </apex:actionFunction>
+                <!-- </a> profileEditPage-->
+              </h2>
+            </div>
+
+            <div class="preferences-section-liner">
+              <div class="row">
+                  <apex:repeat value="{!conWrapperList}" var="con">
+                <div class="contact-item col-sm-4  pr-0">
+                    <div class="contact-item-liner">
+                        <!-- Mobile Edit icon starts(DE9808 Priyanka)-->
+                         <div class=" row hidden-md hidden-lg visible-sm visible-xs">
+                         <div class="col-xs-6 pr-0 pl-10"> <strong class="contact-title Ptitle ">{!con.conType}</strong></div>
+                         <div class="col-xs-4 pr-0 pt-5 pl-10" style="position: relative;right: 38px;">
+                              <apex:commandLink onclick="contactEditPage('{!con.conId}');return false;" styleClass=" addContactText">
+                                  <span class="col-xs-2"><img class="edit-icon iconHeight" type="image/svg+xml" src="{!URLFOR($Resource.wkresources, 'icons/edit.svg')}" /></span><span class="col-xs-2 mrgLeft">EDIT</span>
+                              </apex:commandLink>
+                          </div>
+                          </div>
+                        <!-- Mobile Edit icon ends-->
+                  <div class="mb-15">
+                       <strong class="contact-title Ptitle pr-0 hidden-xs hidden-sm ">
+                      {!con.conType}
+                      <apex:commandLink onclick="contactEditPage('{!con.conId}');return false;" styleClass="editMobile addContactText">
+                          <img class="edit-icon iconHeight" type="image/svg+xml"  src="{!URLFOR($Resource.wkresources, 'icons/edit.svg')}" /> EDIT
+                      </apex:commandLink>
+                      <!--<apex:param name="contactId" value="{!con.conId}"/>
+                      apex:actionFunction name="callcontactEditPage" action="{!callcontactEditPage}"/>-->
+                     <!-- <a href="edit-contact.html"> <img class="edit-icon" type="image/svg+xml" src="{!URLFOR($Resource.wkresources, 'icons/edit.svg')}" /></a> -->
+                  </strong>
+                  </div>
+                  <div class="label">
+                    First Name
+                  </div>
+                  <div class="value">
+                   {!con.firstName}
+                  </div>
+                  <div class="label">
+                    Last Name
+                  </div>
+                  <div class="value">
+                    {!con.lastName}
+                  </div>
+                   <div class="label">
+                    Role
+                  </div>
+                  <div class=" value contact-title">
+                   {!con.conType}
+                  </div>
+                  <div class="label">
+                    Mobile #
+                  </div>
+                  <div class="value">
+                    {!con.mobile}
+                  </div>
+                  <div class="label">
+                    Email
+                  </div>
+                  <div class="value">
+                    {!con.email}
+                  </div>
+                  <div class="emergency-contact">
+                   {!con.emergencyContact}
+                  </div>
+<!--          // Priyanka Defect Fix 9808-->
+                  <!-- <div class="mobile-edit-btn text-left visible-xs visible-sm mb-20">          
+                   <apex:commandLink onclick="contactEditPage('{!con.conId}');return false;" styleClass="secondary button-small">
+                          Edit
+                      </apex:commandLink>
+                      </div>-->
+                  </div>
+                </div>
+                </apex:repeat>
+                <apex:actionFunction name="callcontactEditPageAF" action="{!callcontactEditPage}" reRender="formId">
+                    <!--<apex:param name="cntctParam" assignTo="{!cntctId}" value="{!cntctId}"/>-->
+                    <apex:param name="cntctId" assignTo="{!cntctId}" value=""/>
+                   <!--   <apex:param name="accId" assignTo="{!accountId}" value=""/> -->
+                </apex:actionFunction>
+              </div>
+              <div class="row">
+                  <div class="col-sm-3 col-sm-offset-4">
+                    <div class="more-contacts-btn-wrap">
+                        <button class="more-contacts primary button-small" type="button"> Show More </button>
+                    </div>
+                  </div>
+                </div>
+            </div>
+          </section>
+           
+        </div>
+        <div class="swiper-pagination visible-xs visible-sm"></div>
+      </div>
+
+    </div>
+  </div>
+  <apex:actionFunction name="updateDefaultFineAmount" action="{!updateDefaultFineAmount}" reRender="finepanel">
+    <apex:param name="fineamount" assignTo="{!accDefaultFineAmount}" value=""/>
+  </apex:actionFunction>
+  </apex:form>
+   <c:WK_FooterComponent ></c:WK_FooterComponent>
+     <div class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="section-liner">
+                            <h3> Edit Calculation </h3>
+                            <form id="editImpactCalc" action="post">
+                                <div class="col-md-11 col-md-offset-1">
+                                    <!-- <div class="row">
+                  <div class="calc-title"> Units </div> &nbsp;
+                  <input class="update-units" type="number" name="update-units" value="">
+                </div> -->
+                                    <div class="row">
+                                        <div class="calc-title">Default Fine Amount</div> $
+                                        <input required="true" data-parsley-trigger="keyup" class="update-fine" type="number" name="update-fine" value="" min="1" maxlength="3" max="999" /> </div>
+                                   
+                                </div>
+                                <div class="clearfix"></div>
+                                <div class="row modal-btns gutter-10">
+                                    <div class="col-md-6">
+                                        <button type="button" class="secondary button-small" data-dismiss="modal" aria-label="Cancel"> Cancel </button>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <button id="fineSave" class="primary button-small" type="submit"> save </button>
+                                        
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+          
+   <div class="profile-window"></div>
+</body>
+</apex:page>

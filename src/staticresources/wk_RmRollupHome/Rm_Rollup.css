@@ -1,0 +1,289 @@
+        .propertyBox div {
+                /* margin-top: 20px; */
+        }
+
+         body {
+            background-color: #F7F7F7 !important;
+            height: 1500px !important;
+         }  
+
+
+         form  .row{
+            background-color: #FFFFFF !important;
+         }
+
+         .dropDownText{
+            float: right;
+            display: inline-block;
+         }
+
+         .impact-total.hidden-sm.hidden-xs {
+                float: right;
+            }
+          .showMore .text{
+              cursor: pointer;
+              padding-top: 5%;
+              font-family: Montserrat;
+              font-size: 12px;
+              font-weight: 600;
+              text-align: center;
+              color: #00adef;
+          }
+            .row.showMore {
+                width: 125px;
+                height: 36px;
+                border: solid 1px #00acf2;
+                text-align: center;
+                margin: 0 42%;
+            }
+            .totalValues{
+                    text-align: center;            
+            }
+            .totalValetTrash {
+                margin-bottom: 70px;
+            }
+            .totalValues span {
+                font-family: Montserrat;
+                font-size: 18px;
+                color: #545454;
+                font-weight: 500;
+            }
+            .totalValetTrashValue , .totalViolationsValue {
+                font-family: Montserrat;
+                font-size: 44px;
+                font-weight: bold;
+                text-align: center;
+                color: #48ccff;
+            }
+            .totalValues{
+                padding: 15% 5%;
+            }
+            
+            
+            
+            #rm-violation-chart .c3-line-data1, #rm-violation-chart .c3-shape {
+                stroke-width: 5px;
+                stroke: #00adef !important;
+            }
+
+            #rm-violation-chart .c3-circle {
+                fill: rgb(35, 163, 251) !important;
+            }
+
+            #rm-violation-chart .c3-legend-item{
+                display: none;
+            }
+
+            #rm-violation-chart .c3-tooltip-container {
+                position: relative;
+                padding: 10px; 
+                background: #FFFFFF;
+                color: #69d0f7;
+                border: 1px solid #69d0f7;
+            }
+            #rm-violation-chart .c3-tooltip-container:after, #rm-violation-chart .c3-tooltip-container:before {
+                top: 100%;
+                left: 25%;
+                border: solid transparent;
+                content: " ";
+                height: 0;
+                width: 0;
+                position: absolute;
+                pointer-events: none;
+            }
+
+            #rm-violation-chart .c3-tooltip-container:after {
+                border-color: rgba(255, 255, 255, 0);
+                border-top-color: #FFFFFF;
+                border-width: 15px;
+                margin-left: -10px;
+            }
+            #rm-violation-chart .c3-tooltip-container:before {
+                border-color: rgba(105, 208, 247, 0);
+                border-top-color: #69d0f7;
+                border-width: 17px;
+                margin-left: -12px;
+            }
+
+            .propertyNamesBox {
+                cursor: pointer;
+                margin-top: 23px;
+                width: 180px;
+                height: 187px;
+                background-color: #ffffff;
+                border: solid 1px #00adef;
+            }
+
+            .propertyBox {
+                height: 100%;
+                /* text-align: center; */
+            }
+
+            span.propertyName {
+                
+                font-family: Montserrat;
+                font-size: 14px;
+                font-weight: 600;
+                color: #003660;
+            }
+
+            span.contactType {
+                font-style: italic;
+                color: #545454;
+            }
+
+            span.contactName {
+                color: #424242;
+            }
+
+            span.contactNumber {
+                color: #545454;
+            }
+            
+            
+            
+            /* doughnut style */
+            .doughnutChart {
+                height: 300px;
+            }
+
+            svg {
+                width: 100%;
+                height: 100%;
+            }
+            
+            path.slice{
+                stroke-width:2px;
+            }
+            
+            polyline{
+                opacity: .3;
+                stroke: black;
+                stroke-width: 2px;
+                fill: none;
+            }
+            
+            .labelValue
+            {
+                font-size: 60%;
+                opacity: .5;
+                
+            }
+            
+            .toolTip {
+                font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+                position: absolute;
+                display: none;
+                /* width: 127px; */
+                height: 40px;
+                background: none repeat scroll 0 0 white;
+                border:1px solid red;   
+                box-shadow: -3px 3px 15px #888888;
+                color:  #00adef;
+                font: 12px sans-serif;
+                padding: 5px;
+                text-align: center;
+				 padding-top: 13px;
+            }
+            .toolTip::after {
+                content: "";
+                position: absolute;
+                top: 100%;
+                left: 10%;
+                margin-left: -5px;
+                border-width:8px;
+                border-style: solid;
+                border-color: white transparent transparent transparent;
+            }
+			.firstDiv{
+              top: 148px;
+              left: 18px;
+              font-size: 14px;
+              text-align: center;
+              color: #545454;
+             text-transform: uppercase;
+             font-family: Montserrat;
+            }
+           
+            text {
+              font: 12px sans-serif;
+            }
+
+            text.data{
+                font-size: 14px;
+            }
+
+            g.labelName > text.inside{
+                font-size: 40px;
+                fill: #48ccff;
+            }
+
+
+            g.labelName > text.data{
+                fill: #000000;
+            }
+            
+            g.labelName > text{
+                fill: white;
+            }
+            .doughnutChart + div .valet-key-item {
+                margin-top: 14px;
+                display: block;
+            }
+            /* end of doughnut style */
+
+
+            .totalViolationsText{  
+                font-size: 20px;
+                font-weight: bold;
+                color: #003660;
+            }
+
+            .violationsPicklist{
+                width: 105px !important;
+                border-bottom: none !important;
+                color: #00acf2 !important;
+            }
+
+            .totalViolationsFreq > h3, .NoiFreq > h3{
+                float: left;
+            }
+
+            .totalViolationsFreq > div{
+                display: inline-block;
+                margin-top: 20px;
+            }
+
+            .NoiFreq > div{
+                display: inline-block;
+            }
+
+            .totalViolationsFreq > div > div:first-child , .NoiFreq > div > div:first-child{
+                float: left;
+                padding: 0 10px;
+            }
+
+            .totalViolationsFreq > div > div.dropDownText, .NoiFreq > div > div.dropDownText{
+                position: relative;
+                bottom: 2px;
+            }
+
+            @media only screen and (min-width: 991px){
+                form{
+                    margin-top: -70px;
+                }
+
+                .doughnutChart {
+                    border-left: 1px solid #f2f2f2;
+                }
+            }
+
+            @media only screen and (max-width: 990px){
+                .doughnutChart {
+                    border-top: 1px solid #f2f2f2;
+                }
+
+                .totalViolationsFreq > div, .NoiFreq > div{
+                    float: right;
+                }
+            }

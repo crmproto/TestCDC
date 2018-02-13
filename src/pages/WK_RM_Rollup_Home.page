@@ -1,0 +1,411 @@
+<apex:page docType="html-5.0" showHeader="false" standardStylesheets="false" sidebar="false" controller="WK_RM_Rollup_HomeController" action="{!navigateToPages}">
+    
+    <head>
+        <meta name="viewport" content="initial-scale=1.0" />
+        <meta name="description" content="Wellkept Dashboard" />
+        <title>Home | Wellkept</title>
+        <link href="https://fonts.googleapis.com/css?family=Montserrat:300,400,600,700" rel="stylesheet" />
+        <link href="https://fonts.googleapis.com/css?family=Merriweather:300,400,700,900" rel="stylesheet" />
+        <apex:stylesheet value="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" />
+        <apex:stylesheet value="{!URLFOR($Resource.wkresources, 'js/c3/c3.min.css')}" />
+        <apex:stylesheet value="{!URLFOR($Resource.wkresources, 'js/swiper/dist/css/swiper.min.css')}" />
+        <apex:stylesheet value="{!URLFOR($Resource.wkresources, 'js/odometer/themes/odometer-theme-default.css')}" />
+        <apex:stylesheet value="{!URLFOR($Resource.wkresources, 'css/main.css')}" />
+        <apex:stylesheet value="{!URLFOR($Resource.wk_RmRollupHome, 'Rm_Rollup.css')}" />
+
+        <apex:includeScript value="{!URLFOR($Resource.wkresources, 'js/jquery.min.js')}" />
+        <apex:includeScript value="{!URLFOR($Resource.wkresources, 'js/bootstrap/dist/js/bootstrap.min.js')}" />
+        <apex:includeScript value="{!URLFOR($Resource.wkresources, 'js/jquery.nice-select.min.js')}" />
+        <apex:includeScript value="{!URLFOR($Resource.wkresources, 'js/swiper/dist/js/swiper.min.js')}" />
+        <apex:includeScript value="{!URLFOR($Resource.wkresources, 'js/d3/d3.min.js')}" />
+        <apex:includeScript value="{!URLFOR($Resource.wkresources, 'js/c3/c3.min.js')}" />
+        <apex:includeScript value="{!URLFOR($Resource.wkresources, 'js/jquery.cookie/jquery.cookie.js')}" />
+
+        <apex:includeScript value="{!URLFOR($Resource.wkresources, 'js/odometer/odometer.js')}" />
+        <apex:includeScript value="{!URLFOR($Resource.wkresources, 'js/parsleyjs/dist/parsley.min.js')}" />
+
+        <apex:includeScript value="{!URLFOR($Resource.wkresources, 'js/main.js')}" />
+
+        <style type="text/css">
+       /*  <!--priyanka 8847-->    */
+           span.propertyName{
+           text-transform:uppercase !important;
+           }
+           .impact-total{
+               font-size:18px;
+           }
+         /*  <!--priyanka 8847-->    */   
+          .headingColor{
+               color:#003660 !important;
+           }
+           .impact-chart{
+               text-transform:uppercase;
+           }
+            .propertyBoxRM{
+                text-align: center;
+            }
+             .topMar{
+             margin-top:80px;
+            }
+               .waitPopUp {
+            height:auto !important;
+            }
+           @media only screen and (min-width: 1025px) {
+                .NoiFreq > div > div.dropDownText {
+                        position: relative;
+                        bottom: 2px;
+                      right: 80px !important;
+                    }
+                    .dropDownText {
+                    float: none!important; 
+                        
+                    }
+
+            } 
+            @media only screen and (min-device-width : 375px) and (max-device-width : 667px){
+                 .borderMob { 
+                        
+                         border-left: solid 2px #f5f4f4;
+                         padding-left:30px;
+                }
+            }
+            @media (min-width: 320px) and (max-width: 480px) {
+                
+                .borderMob { 
+                        
+                         border-left: solid 2px #f5f4f4 !important;
+                         padding-left:30px !important;
+                }
+            .mobileMrg{
+            margin-left:30px;
+            }
+            
+             .row .showMore {
+                   margin: 0 27% !important;
+                }
+                .phoneHgt {
+                 margin-top: 20px !important;
+                }
+             .topMar{
+                     margin-top:0px;
+                    }
+                          
+                 .totalValetTrashValue, .totalViolationsValue {
+                    font-family: Montserrat;
+                    font-size: 20px;      
+                 }
+                .propertyNamesBox {
+                        cursor: pointer;
+                        margin-top: 23px;
+                         width: 120px; 
+                        height: 187px;
+                        background-color: #ffffff;
+                        border: solid 1px #00adef;
+                    }
+                                     
+                 
+                 .no_pad{
+                  padding:0px !important;
+                 }
+                 .no_show{
+                 display:none;
+                 }
+                 .mobile-text{
+                 font-size:16px;
+                 }
+                 .font-small{
+               font-size:18px  !important;   
+              
+                 }
+                 .mrgLeft{
+                      margin-left:30px !important;
+                 }
+                 .mobile-text-1{
+                  font-size:14px;
+                 }
+                 .current{
+                  font-size:14px;
+                 }
+                 .totalValues span {
+                     font-size:12px !important; 
+                 }
+                 .totalValetTrash {
+                 margin-bottom: 5px  !important; 
+                }
+                .totalValues {
+                    padding: 0% 5%;
+                }
+                 .nice-select::after {
+                 
+                 -webkit-transform-origin: 15% 53%;
+                 }
+                 
+                 
+                 }
+                 // Defect Fix Ashish 9878 
+                .impact-total {
+                   text-align: right;
+                 }
+                 
+
+
+
+
+        </style>
+
+    </head>
+    <c:WK_HeaderComponent ></c:WK_HeaderComponent>
+
+    <body class="home">
+    <div class="profile-window"></div>
+        <apex:form Id="formId">
+            <div class="container">
+                <div class= "row mt-10 " id="charts-div">
+                    <!-- Section for Line Chart Starts here  -->
+                    <div class="row ml-0 mr-0">
+                        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 totalViolationsFreq">
+                            <h3 class="mobile-text headingColor">Total Violations</h3>
+                            <div >
+                                <div class="mobile-text-1">IN LAST</div>
+                                <div class="value dropDownText">
+                                    <apex:selectList value="{!selectedLineSequence}" id="State" size="1" styleClass="violationsPicklist" onchange="picklistValuesJS()">
+                                    <apex:selectOptions value="{!getRollupPicklist}" />
+                                    <apex:actionFunction action="{!runQuery}" name="picklistValuesAS" reRender="charts-div" oncomplete="renderPage('{!jsonStringForMonths}', '{!jsonStringForDonutChart}');" /> 
+                                    </apex:selectList>
+                                </div>    
+                            </div>
+                           <!-- <span class="totalViolationsText pl-10">Total Violations</span>
+                            <span>IN LAST </span>
+                            <span class = "value dropDownText">
+                                 <apex:selectList value="{!selectedLineSequence}" id="State" size="1" styleClass="violationsPicklist" onchange="picklistValuesJS()">
+                                <apex:selectOptions value="{!getRollupPicklist}" />
+                                <apex:actionFunction action="{!runQuery}" name="picklistValuesAS" reRender="charts-div" oncomplete="  renderPage('{!jsonStringForMonths}', '{!jsonStringForDonutChart}');" /> 
+                               </apex:selectList>
+                           </span> -->
+                        </div>
+                        <div class="col-xs-0 col-sm-0 col-md-4 col-lg-8 ">
+
+                        </div>
+                    </div>
+                    
+                    <div class="row ml-0 mr-0">
+                        <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 lineGraph " id="lineChartId">
+                            <div id="rm-violation-chart"></div>
+                        </div>
+
+                        <!-- Section for Line Chart Ends here  -->
+            
+                        <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 mobileMrg" id="doughnutChartId">
+                            <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 doughnutChart">
+                              
+                            </div>
+                            <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 topMar">
+                            </div>
+                        </div>
+
+                    </div>     
+                </div>
+            
+                <div class=" row mt-20 impact-to-net">
+                    <div class="col-xs-12">
+                        <div class="section-liner">
+                            <!-- <div class="NoiFreq hidden-sm hidden-xs">
+                                <h3 class="headingColor"> Impact to Net Operating Income From Valet Trash </h3>
+                                <div>
+                                    <div>IN LAST</div>
+                                    <div class="value dropDownText">
+                                        <apex:selectList value="{!selectedNOISequence}" id="NOISEQ" size="1" styleClass="violationsPicklist" onchange="picklistValuesNOIJS()">
+                                          <apex:selectOptions value="{!getRollupPicklist}" />
+                                            <apex:actionFunction action="{!pageLoadActionCall}" name="picklistValuesNOIAS" reRender="impact-to-net-div, impact-to-net-div-total, impact-to-net-div-total_1 " oncomplete="initNOI();" />
+                                        </apex:selectList>
+                                    </div>    
+                                </div>
+                            </div> -->
+                            <div class="NoiFreq row ">
+                                <h3 class="col-xs-5 col-md-6 no_pad headingColor"> Impact to Net Operating Income From Valet Trash </h3>
+                                <div class="col-xs-7 col-md-3 no_pad">
+                                    <div>IN LAST</div>
+                                    <div class="value dropDownText">
+                                        <apex:selectList value="{!selectedNOISequence}" id="NOISEQ_1" size="1" styleClass="violationsPicklist" onchange="picklistValuesNOIJS()">
+                                          <apex:selectOptions value="{!getRollupPicklist}" />
+                                            <apex:actionFunction action="{!pageLoadActionCall}" name="picklistValuesNOIAS" reRender="impact-to-net-div, impact-to-net-div-total_1 ,impact-to-net-div-total" oncomplete="initNOI();" />
+                                        </apex:selectList>
+                                    </div>    
+                                </div>
+                            </div>
+                              <div class="row visible-xs ">
+                                    <apex:outputPanel id="impact-to-net-div-total_1">
+                                        <div class=" row totalValues">
+                                            <div class="col-xs-6 totalValetTrash">
+                                                <div><span>TOTAL</span></div>
+                                                <!-- <div class="totalValetTrashValue">${!totalIncomeValet}</div> -->
+						 <!--// Defect Fix Ashish 9780 -->
+                                                <div class="totalValetTrashValue"></div>
+                                                <div><span>VALET TRASH MARKUP</span></div>   <!--priyanka 8847-->                                
+
+                                            </div>
+                                            <div class="col-xs-6 totalViolations borderMob">
+                                                 <div class="totalValues"><span>TOTAL</span></div>
+					<!--	 // Defect Fix Ashish 9780 -->
+                                                 <!-- <div class="totalViolationsValue" style=" color: #00adef;">${!totalIncomeOpp}</div> -->
+                                                 <div class="totalViolationsValue" style=" color: #00adef;"></div>
+                                                 <div><span>VIOLATIONS</span></div> 
+                                            </div>
+                                        </div>
+                                    </apex:outputPanel>
+                                </div>
+                           <!--  <div class="time-frame"> Last 30 days </div> -->
+                          <!--  <div class="row text-center">
+                                <div class="impact-total visible-sm visible-xs"> <span>$</span> <span class="odometer" id="impactTotalMobile"></span> </div>
+                            </div>-->
+                            <div class="row" id="">
+                                <div class="col-md-8">
+                                    <!-- Apex Repeat can be used here  -->
+                                    <div class="row impact-graph">
+                                        <apex:outputPanel id="impact-to-net-div">
+                                        <apex:repeat value="{!impactAccountWrapperList}" var="accItr">
+                                            <div class="col-md-12 col-sm-12 col-xs-12">
+                                                <!--<div class="impact-chart" data-valet-trash = "{!accItr.incomeOpp}" data-violations = "{!accItr.incomeValet}">-->
+                                                <div class="impact-chart" data-valet-trash = "{!accItr.incomeValet}" data-violations = "{!accItr.incomeOpp}">
+                                                    <div><span>{!accItr.accName}</span></div>
+                                                    <div class="impact-valet-trash-bar impact-bar font-small"> <span>$</span><span class="impact-valet-trash-value"></span> </div>
+                                                    <div class="impact-valet-violation-bar impact-bar font-small"> <span>$</span><span class="impact-valet-violation-value"></span> </div>                                        
+                                                    <div class="impact-total font-small"> <span class="mrgLeft">$</span> <span class="odometer" id="impactTotal"></span> </div>
+                                                </div>
+                                            </div>
+                                        </apex:repeat>
+                                        </apex:outputPanel>
+                                    </div>                            
+
+                                    <div class="row showMore"><div class="text ">SHOW MORE</div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-md-3 ">
+                                        </div>
+                                        <div class="col-md-9 ">
+                                            <div class="valet-legend pt-20 pl-0">
+                                                <div class="valet-key-item"> <span class="valet-key key-square"></span> NOI from Valet Trash </div>
+                                                <div class="valet-key-item violation-legend-item "> <span class="violation-key key-square"></span> NOI Opportunity From Violations </div>
+                                                <div class="clearfix"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 hidden-sm hidden-xs">
+                                    <apex:outputPanel id="impact-to-net-div-total">
+                                        <div class="totalValues">
+                                            <div class="row totalValetTrash">
+                                                <div><span>TOTAL</span></div>
+                                                <div class="totalValetTrashValue">${!totalIncomeValet}</div>
+                                                <div><span>VALET TRASH<br/> MARKUP</span></div>     <!--priyanka 8847-->                                  
+
+                                            </div>
+                                            <div class="row totalViolations">
+                                                 <div><span>TOTAL</span></div>
+                                                 <div class="totalViolationsValue" style=" color: #00adef;">${!totalIncomeOpp}</div>
+                                                 <div><span>VIOLATIONS</span></div> 
+                                            </div>
+                                        </div>
+                                    </apex:outputPanel>
+                                </div>
+                            </div>
+                            <div class="clearfix"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <section class="row mt-20 service-section">
+                    <div class="col-xs-12">
+                        <div class="section-liner">
+                            <h3 class="headingColor"> My Properties </h3>
+                            <div class="swiper-container">
+                                <div class="swiper-wrapper">
+                                    <apex:repeat value="{!AccContDirectWrapperList}" var="accDetail">
+                                    <div class="swiper-slide" id="001">
+                                        <div class="propertyNamesBox" onClick="accountfunction('{!accDetail.accId}', event);return false">
+                                            <div class="propertyBox propertyBoxRM">
+                                                <div class="mt-10 " style="height: 40%; ">
+                                                    <span class="propertyName">{!accDetail.accName}</span>
+                                                </div>
+                                                <div >
+                                                    <span class="contactName">{!accDetail.contName}</span>
+                                                </div>
+                                                <div >
+                                                    <span class="contactType">{!accDetail.contType}</span>
+                                                </div>
+                                                <div class="mt-30 phoneHgt ">
+                                                    <span class="contactNumber">{!accDetail.contPhone} </span>
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                    </apex:repeat>
+                                    
+                                </div>
+                            </div>
+                            <!-- Swiper Arrows -->
+                            <div class="swiper-button-next"></div>
+                            <div class="swiper-button-prev"></div>
+                            <!-- Swiper Pagination -->
+                            <div class="swiper-pagination visible-sm visible-xs"></div>
+
+                        </div>
+                    </div>
+                </section>
+                <apex:actionFunction name="goToHomepageController" action="{!goToAccount}" reRender="001">
+                    <apex:param name="accId" value=""/>
+                </apex:actionFunction>                
+            </div>
+            <c:WK_FooterComponent ></c:WK_FooterComponent>
+        </apex:form>
+
+        <apex:includeScript value="{!URLFOR($Resource.wk_RmRollupHome, 'Rm_Rollup_home.js')}" />
+
+        <script>
+
+            $(document).ready(function(){
+                $('.navigationLinksRM li ').eq(0).addClass('active');
+
+                renderPage('{!jsonStringForMonths}', '{!jsonStringForDonutChart}');
+                initNOI();
+                createSwiper(); 
+               $('.option').on("touchstart", function (e) {
+                this.click();
+                });
+       
+            });
+
+            function commaOnTotal(){
+                /* Defect Fix Ashish 9780 */
+                var totIncomeValet = '{!totalIncomeValet}';
+                totIncomeValet = commaSeparateNumber(totIncomeValet);
+                //totIncomeValet= parseInt(totIncomeValet).toLocaleString('en');
+                $('.totalValetTrashValue').text('$' + totIncomeValet);
+
+                var totIncomeOpp = '{!totalIncomeOpp}';
+                //totIncomeOpp= parseInt(totIncomeOpp).toLocaleString('en');
+                totIncomeOpp = commaSeparateNumber(totIncomeOpp);
+                $('.totalViolationsValue').text('$' + totIncomeOpp);
+            }
+
+        </script>
+        <style type="text/css">
+          .footer {
+            margin-top: 0;
+          }
+          .service-section .section-liner {
+              min-height: 322px;
+          }
+          
+          .service-section .swiper-container {
+              margin: 23px 15px 46px;
+              padding: 0 0 0;
+          }
+
+        </style>
+
+             
+    </body>
+</apex:page>

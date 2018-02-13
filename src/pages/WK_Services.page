@@ -1,0 +1,228 @@
+<apex:page docType="html-5.0" showHeader="false" standardStylesheets="false" controller="WK_HomePageController" sidebar="false">
+
+    <head>
+        <meta name="viewport" content="initial-scale=1.0" />
+        <meta name="description" content="Wellkept Dashboard" />
+        <title>Services | Wellkept</title>
+        <meta name="format-detection" content="telephone=no" />
+        <link href="https://fonts.googleapis.com/css?family=Montserrat:300,400,600,700" rel="stylesheet" />
+        <link href="https://fonts.googleapis.com/css?family=Merriweather:300,400,700,900" rel="stylesheet" />
+        <apex:stylesheet value="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" />
+        <apex:stylesheet value="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.11.1/bootstrap-table.min.css" />
+        <apex:stylesheet value="{!URLFOR($Resource.wkresources, 'js/c3/c3.min.css')}" />
+        <apex:stylesheet value="{!URLFOR($Resource.wkresources, 'js/swiper/dist/css/swiper.min.css')}" />
+        <apex:stylesheet value="{!URLFOR($Resource.wkresources, 'css/main.css')}" />
+
+        <apex:includeScript value="{!URLFOR($Resource.wkresources, 'js/jquery.min.js')}" />
+        <apex:includeScript value="{!URLFOR($Resource.wkresources, 'js/bootstrap/dist/js/bootstrap.min.js')}" />
+        <apex:includeScript value="{!URLFOR($Resource.wkresources, 'js/jquery.nice-select.min.js')}" />
+        <apex:includeScript value="{!URLFOR($Resource.wkresources, 'js/swiper/dist/js/swiper.min.js')}" />
+        <apex:includeScript value="{!URLFOR($Resource.wkresources, 'js/d3/d3.min.js')}" />
+        <apex:includeScript value="{!URLFOR($Resource.wkresources, 'js/c3/c3.min.js')}" />
+        <apex:includeScript value="{!URLFOR($Resource.wkresources, 'js/jquery.cookie/jquery.cookie.js')}" />
+        <apex:includeScript value="{!URLFOR($Resource.wkresources, 'js/parsleyjs/dist/parsley.min.js')}" />
+        <apex:includeScript value="{!URLFOR($Resource.wkresources, 'js/main.js')}" />
+
+        <apex:stylesheet value="{!URLFOR($Resource.wk_services, 'services-page.css')}" />
+        <style>
+           .upcoming-services span.number span:first-child {
+        top: -2px;
+       }    
+       .upcoming-services span.number span {
+       font-weight: normal;
+       }
+         @media screen and (min-width: 96px) and (max-width : 906px){
+        .swiper-container{
+       height:210px;
+       }    
+       .swiper-pagination {
+        z-index:0;
+       } 
+
+      }
+        /* 8887 (Priyanka)     */
+      @media screen and (min-width:990px) and (max-width : 1200px){
+              
+             .service-box {
+                width: 145px !important;
+                 
+             }
+              
+            }
+        </style>
+
+    </head>
+
+    <body>
+    <!-- DE9760 --> 
+        <c:WK_HeaderComponent title="{!$Label.WK_ServicesLabel}" ></c:WK_HeaderComponent>
+        <div class="container">
+            <div class="col-md-12 services">
+                <div class="page-header">
+                    <h1 class="">Services</h1>
+                </div>
+                <div class="row mt-25">
+                    <div class="col-md-7 col-sm-7 pr-0 ml-0 pl-70" id="service-box-list">
+                       <!-- list will come from javascript services-boxes.js -->
+                    </div>
+                    
+                    <!-- Begin Swiper for mobile view -->
+                    <div class="service-section" id="service-swiper-box">
+                        <div class="section-liner pb-0">
+                            <h3>Recommended Services</h3>
+                            <div class="swiper-container">
+                                <div id="swiper-wrapper-list" class="swiper-wrapper"></div>
+                            </div>
+                 
+                            <!-- Swiper Arrows Priyanka De 9807-->
+                            <div class="swiper-button-next hidden-sm hidden-xs"></div>
+                            <div class="swiper-button-prev hidden-sm hidden-xs"></div>
+                            <!-- Swiper Pagination -->
+                            <div class="swiper-pagination visible-sm visible-xs"></div>
+                        </div>
+                    </div>
+                    <!-- End Swiper for mobile view -->
+
+                    <div class="col-md-5 col-sm-5 pr-0 mb-20 Service-Tab" id="upcoming-services-div">
+                        <div class="upcoming-services" id="VertiHor">
+                            <div class="pt-20 mb-10">
+                                <div class="row">
+                                    <div class="col-xs-9 col-md-9">
+                                        <p class="mt-0 mb-5 upServTitle">Upcoming Services</p>  
+                                    </div>
+                                    <div class="col-xs-2 col-md-2">
+                                        <a href="{!URLFOR($Page.WK_Reports)}?Type=Upcoming&id={!accountId}" class="secondary button-small view">VIEW MORE</a>
+                                    </div>
+                                </div>
+                                <a href="{!URLFOR($Page.WK_Reports)}?Type=Services&id={!accountId}">VIEW HISTORY</a>
+                            </div>
+                            <div id="upcomingServicesList">
+                                <!-- list will come from javascript upcoming-services.js -->
+                            </div>
+                            
+                        </div>
+                        <div class="mobileView">
+                                <center>
+                                    <a href="{!URLFOR($Page.WK_Reports)}?Type=Upcoming&id={!accountId}" class="secondary button-small view">View More</a>
+                                </center>
+                        </div>
+                    </div>
+                   
+                    <div class="col-md-5 col-sm-5 pr-0 myServices">
+                         <p class="mt-10 mb-20 upServTitle">My Services <span>({!listfJasonServicesWrappersize})</span></p>
+                        <div class="pr-0 Service-Tab2">
+                            <div class="myServices" id="myServices">                           
+                                <apex:repeat value="{!listfJasonServicesWrapper}" var="serviceWrap">
+                                    <apex:outputPanel rendered="{!IF(serviceWrap.services != '',true,false)}" styleClass="list">  
+                                        <div class="row ml-5 serviceInfo">
+                                            <div class="col-xs-2 mr-10">
+                                                <div> 
+                                                    <img src="{!URLFOR($Resource.wkresources, 'icons/doortodoor.svg')}" type="image/svg+xml" class="service-icon" /> 
+                                                </div>
+                                            </div>
+                                            <div class="col-xs-8">
+                                                <p class="servicTitle" title='{!serviceWrap.services}'>{!serviceWrap.services}</p>
+                                                <p class="servicTitledays">{!serviceWrap.frequency}</p>
+                                            </div>
+                                        </div>
+                                    </apex:outputPanel>
+                                </apex:repeat>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!--Violation Details Start-->
+
+        <c:WK_FooterComponent ></c:WK_FooterComponent>         
+       
+        <div id="service-box-modals"></div>
+        
+        <div class="profile-window"></div>
+        <!--Violation Details End-->
+        
+        <apex:includeScript value="{!URLFOR($Resource.wk_services, 'service-boxes.js')}" />
+        <apex:includeScript value="{!URLFOR($Resource.wk_services, 'upcoming-services.js')}" />
+        <apex:includeScript value="{!URLFOR($Resource.wk_services, 'my-services.js')}" />
+
+
+        <script>
+             $(window).on('load', function() {
+            if($('.swiper-container').hasClass('swiper-container-android') == true){
+               $('.swiper-container').removeClass('swiper-container-android');
+                
+            }
+        });
+        
+            $( document ).ready(function() {
+                var myServiceResources = {imageURL: '{!URLFOR($Resource.wkresources, "icons/")}'};
+                MyServices.init(myServiceResources); 
+
+                var serviceCount={!JSONStringforServices}.length;
+                    
+                if(serviceCount==1){
+                $('.Service-Tab2').css("height"," 150px;");
+                $('.upcoming-services').css("height"," 500px;"); 
+                 $('.Service-Tab2').css('overflow-y','hidden');  
+ 
+            }
+             if(serviceCount==2 || serviceCount==3){
+               $('.Service-Tab2').css('overflow-y','hidden');  
+               }   
+            
+            if(serviceCount>=4){
+                $('.Service-Tab2').css("height"," 275px;");
+                $('.upcoming-services').css("height"," 375px;");  
+                  $('.Service-Tab2').css('overflow-y','hidden');        
+            }
+            });
+            
+
+            function createSwiper() {
+                var appendNumber = 4;
+                var prependNumber = 1;
+                var swiper = new Swiper('.swiper-container', {
+                    pagination: '.swiper-pagination',
+                    nextButton: '.swiper-button-next',
+                    prevButton: '.swiper-button-prev',
+                    paginationClickable: true,
+                    slidesPerView: 2,
+                    spaceBetween: 10,
+                    breakpoints: {
+                        991: {
+                            slidesPerView: 2
+                        }
+                    }
+                });
+                
+                if($('.swiper-container').hasClass('swiper-container-android') == true){
+                    $('.swiper-container').removeClass('swiper-container-android');
+                    
+                }
+                
+                
+            }
+
+            var serviceStaticResources = {
+                iconURL: '{!URLFOR($Resource.wkservicesImg, "serviceIcon/")}',
+                orderURL: {
+                    contact_us:'{!URLFOR($Page.WK_ContactUs)}?Type=<TYPE>&Id={!accountId}',
+                    junk_removal:'{!URLFOR($Page.WK_JunkRemovalPage)}?Id={!accountId}',
+                },
+                modalImgURL: '{!URLFOR($Resource.wkservicesImg, "services/")}'
+            };
+
+            var sl = new ServiceBoxList("service-box-list", 'service-box-modals', serviceStaticResources);
+            sl.init();
+            sl.initSwiper("swiper-wrapper-list");
+            createSwiper();
+
+            UpcomingServices.init('#upcomingServicesList', '{!upcjsonstring}');
+
+        </script>
+
+    </body>
+
+</apex:page>

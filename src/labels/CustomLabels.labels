@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
+    <labels>
+        <fullName>WK_AddContactsLabel</fullName>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>WK_AddContactsLabel</shortDescription>
+        <value>ADD CONTACT</value>
+    </labels>
+    <labels>
+        <fullName>WK_ContactUsLabel</fullName>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>WK_ContactUsLabel</shortDescription>
+        <value>CONTACT US</value>
+    </labels>
+    <labels>
+        <fullName>WK_DocumentsLabel</fullName>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>WK_DocumentsLabel</shortDescription>
+        <value>DOCUMENTS</value>
+    </labels>
+    <labels>
+        <fullName>WK_EditProfileLabel</fullName>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>WK_EditProfileLabel</shortDescription>
+        <value>EDIT PROFILE</value>
+    </labels>
+    <labels>
+        <fullName>WK_ProfileLabel</fullName>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>WK_ProfileLabel</shortDescription>
+        <value>PREFERENCES</value>
+    </labels>
+    <labels>
+        <fullName>WK_ReportsLabel</fullName>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>WK_ReportsLabel</shortDescription>
+        <value>REPORTS</value>
+    </labels>
+    <labels>
+        <fullName>WK_ServicesLabel</fullName>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>WK_ServicesLabel</shortDescription>
+        <value>SERVICES</value>
+    </labels>
+    <labels>
+        <fullName>WK_ViolationDetailLabel</fullName>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>WK_ViolationDetailLabel</shortDescription>
+        <value>VIOLATION DETAILS</value>
+    </labels>
+    <labels>
+        <fullName>wk_homepageLabel</fullName>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>wk_homepageLabel</shortDescription>
+        <value>HOME</value>
+    </labels>
+</CustomLabels>

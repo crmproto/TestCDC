@@ -1,0 +1,857 @@
+<apex:page docType="html-5.0" showHeader="false" standardStylesheets="false" sidebar="false" controller="WK_HomePageController">
+    <head>
+        <meta name="viewport" content="initial-scale=1.0" />
+        <meta name="description" content="Wellkept Dashboard" />
+        <title>Home | Wellkept</title>
+        <link href="https://fonts.googleapis.com/css?family=Montserrat:300,400,600,700" rel="stylesheet" />
+        <link href="https://fonts.googleapis.com/css?family=Merriweather:300,400,700,900" rel="stylesheet" />
+        <apex:stylesheet value="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" />
+        <apex:stylesheet value="{!URLFOR($Resource.wkresources, 'js/c3/c3.min.css')}" />
+        <apex:stylesheet value="{!URLFOR($Resource.wkresources, 'js/swiper/dist/css/swiper.min.css')}" />
+        <apex:stylesheet value="{!URLFOR($Resource.wkresources, 'js/odometer/themes/odometer-theme-default.css')}" />
+        <apex:stylesheet value="{!URLFOR($Resource.wkresources, 'css/main.css')}" />
+        <apex:includeScript value="{!URLFOR($Resource.wkresources, 'js/jquery.min.js')}" />
+        <apex:includeScript value="{!URLFOR($Resource.wkresources, 'js/bootstrap/dist/js/bootstrap.min.js')}" />
+        <apex:includeScript value="{!URLFOR($Resource.wkresources, 'js/jquery.nice-select.min.js')}" />
+        <apex:includeScript value="{!URLFOR($Resource.wkresources, 'js/swiper/dist/js/swiper.min.js')}" />
+        <apex:includeScript value="{!URLFOR($Resource.wkresources, 'js/d3/d3.min.js')}" />
+        <apex:includeScript value="{!URLFOR($Resource.wkresources, 'js/c3/c3.min.js')}" />
+        <apex:includeScript value="{!URLFOR($Resource.wkresources, 'js/jquery.cookie/jquery.cookie.js')}" />
+
+        <apex:includeScript value="{!URLFOR($Resource.wkresources, 'js/odometer/odometer.js')}" />
+        <apex:includeScript value="{!URLFOR($Resource.wkresources, 'js/parsleyjs/dist/parsley.min.js')}" />
+
+        <!-- <apex:includeScript value="{!URLFOR($Resource.wkresources, 'js/main.js')}" /> -->
+        <apex:stylesheet value="{!URLFOR($Resource.wk_services, 'services-home-page.css')}" />
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.6.15/browser-polyfill.min.js"></script>
+      
+        
+        <style>
+         .violation-numbers .violation-value {
+            font-weight:800;
+        }
+        .button-small{
+            font-size:12px;
+        }
+        .upcoming-services-div .view {
+         height: 36px;
+         width: 90px;
+         font-weight:600;
+        }
+        button.cta-btn.secondary.button-small {
+          font-weight: 600;
+        }
+        a.cta-btn.secondary.button-small {
+          font-weight: 600;
+          }
+        
+       .upcoming-services span.number span:first-child {
+        top: -2px;
+       }    
+       .upcoming-services span.number span {
+       font-weight: normal;
+       }
+
+         .swiper-container{
+       height:230px;
+       } 
+     @media only screen and (min-device-width : 1024px) and (max-device-width : 1366px) {
+         .mediaPadd{
+             padding-right:62px;
+         }
+           .last-pickup-times .last-pickup-timestamp {
+            font-size: 20px !important;
+            font-weight: bold;
+              
+          }
+      /*--(9802)priyanka--*/
+      .valet-legend{
+              padding: 25px 0px 0px 25px !important;
+      }
+   /*--(9802)priyanka--*/
+         
+    
+     }
+       
+      @media screen and (min-width: 96px) and (max-width : 906px){
+        
+        .swiper-container{
+       height:230px;
+       
+       }
+       .last-pickup-times .last-pickup-timestamp {
+            font-size: 20px!important;
+            font-weight: bold;
+              
+          }
+      }
+    
+      }
+      
+   
+        </style>
+    
+    </head>
+
+   
+<!-- DE9760 --> 
+
+   <c:WK_HeaderComponent title="{!$Label.wk_homepageLabel}" ></c:WK_HeaderComponent>
+
+    <body class="home">
+
+      <!--   <aside data-toggle="modal" data-target=".bs-feedback-modal-lg" class="feedback" >
+            <div>Feedback</div>
+        </aside> -->        
+
+        <div class="container home-margin">
+            <div class="row gutter-10">
+                <section class="col-md-7">
+                    <div class="section-liner dashboard-violations">
+                        <h3> Violations <span> as of {!todaysDate} </span> </h3>
+                        <div class="row">
+                            <div class="col-md-4 pl-0 pr-0">
+                                <div class="violation-numbers">
+                                    <div class="last-pick-up"> 
+                                    <span class="violation-value"> {!lastViolationPickupNumber} </span> 
+                                    <span class="violation-desc"> Last Pickup </span> </div>
+                                    <div class="daily-average"> 
+                                        <span class="violation-value"> {!avgVioPickupNoForMonth} </span> 
+                                        <span class="violation-desc"> Daily Average 30 Days </span> 
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-8">
+                                <div class="chart-wrap">
+                                    <div id="violations-chart" class="violations-graph"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="cta-wrap"> 
+                            <a href="{!URLFOR($Page.WK_Reports)}?Type=Violations&Id={!accountId}" class="cta-btn secondary button-small"> View </a> 
+                        </div>
+                    </div>
+                    <section class="velet-trash-onsite">
+                        <div class="section-liner">
+                            <h3> Valet Trash On-Site </h3>
+                            <fieldset class="field-wrap">
+                                <legend align="center" class="field-title">last pickup {!JSENCODE(lastPickUpDate)}</legend>
+                            </fieldset>
+                            <div class="row last-pickup-times">
+                                <div class="col-xs-4 last-pickup-day"> {!trashDays} </div>
+                                <div class="col-xs-4 last-pickup-in"> 
+                                    <span class="last-pickup-indication"> In </span> 
+                                    <span class="last-pickup-timestamp">
+                                        <!-- Time must have no spaces between meridiem. -->{!trashIn} 
+                                        <span class="last-pickup-meridiem">{!trashInTime}</span> 
+                                    </span>
+                                </div>
+                                <div class="col-xs-4 last-pickup-out"> 
+                                    <span class="last-pickup-indication"> Out </span> 
+                                    <span class="last-pickup-timestamp">
+                                        <!-- Time must have no spaces between meridiem. --> {!trashOut} 
+                                        <span class="last-pickup-meridiem">{!trashOutTime}</span> 
+                                    </span>
+                                </div>
+                            </div>
+                            <fieldset class="field-wrap">
+                                <legend align="center" class="field-title">Previous pickups</legend>
+                            </fieldset>
+                            <div class="prev-pickups">
+                                <apex:repeat value="{!homeWrap}" var="objWrapper">
+                                    <div class="row prev-pickups-row">
+                                        <div class="col-xs-5 pr-0"> 
+                                            <span class="data-format">{!objWrapper.creatdDate}</span> {!objWrapper.dayOfWeek}
+                                        </div>
+
+                                        <div class="col-xs-4"> {!objWrapper.inTime} </div>
+                                        <div class="col-xs-3"> {!objWrapper.outTime}</div>
+                                    </div>
+                                </apex:repeat>
+                            </div>
+                            <div class="cta-wrap"> 
+                                <a href="{!URLFOR($Page.WK_Reports)}?Type=CheckIn&id={!accountId}" class="cta-btn secondary button-small"> View </a> 
+                            </div>
+                        </div>
+                    </section>
+
+                    <section class="impact-to-net hidden-sm hidden-xs">
+                        <div class="section-liner">
+                            <h3 class="mediaPadd"> Impact to Net Operating Income From Valet Trash </h3>
+                            <div class="time-frame"> Last 30 days </div>
+                            <div class="row text-center" id="changePad">
+                                <div class="impact-total visible-sm visible-xs">
+                                    <span>$</span> 
+                                    <span id="impactTotalMobile" class="odometer" data-total=""></span> 
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <div class="row impact-graph">
+                                        <div class="col-md-8 pl-0 pr-0"> <!--priyanka(9802)-->
+                                            <div class="impact-chart">
+                                                <div class="impact-valet-trash-bar impact-bar"> 
+                                                    <span>$</span>
+                                                    <span class="impact-valet-trash-value"></span> 
+                                                </div>
+                                                <div class="impact-valet-violation-bar impact-bar"> 
+                                                    <span>$</span>
+                                                    <span class="impact-valet-violation-value"></span> 
+                                                </div>
+                                                <div class="clearfix"></div>
+                                            </div>
+                                            <div class="valet-legend">
+                                                <div class="valet-key-item"> 
+                                                    <span class="valet-key key-square"></span> 
+                                                    Income from Valet Trash 
+                                                </div>
+                                                <div class="valet-key-item violation-legend-item"> 
+                                                    <span class="violation-key key-square"></span> 
+                                                    Income Opportunity From Violations 
+                                                </div>
+                                                <div class="clearfix"></div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3 "> <!--priyanka(9802)-->
+                                            <div class="impact-total hidden-xs hidden-sm"> <span>$</span> <span id="impactTotal" class="odometer" data-total=""></span> </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="impact-keys">
+                                        <div class="impact-keys-liner">
+                                            <div class="key-row">
+                                                <!-- This value defines the value for 'Units'. Inject integer where data-units="...". -->
+                                                <span id="fromValetTrash" class="key-values" data-units="{!totalLineItemUnits}"></span> 
+                                                Units 
+                                            </div>
+                                            <div class="key-row">
+                                                <!-- This value defines the value for 'Monthly Resident Markup'. Inject integer where data-markup="...". -->
+                                                <span id="monthlyMarkup" class="key-values" data-markup="{!monthlyResMarkup}"></span> 
+                                                Monthly Resident Markup 
+                                            </div>
+                                            <div class="key-row">
+                                                <!-- This value defines the value for 'Violation Fine Amount'. Inject integer where data-units="...". -->
+                                                <span id="fromviolations" class="key-values" data-violation="{!vioFineAmount}"></span> 
+                                                Violation Fine Amount 
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="clearfix"></div>
+                            <div class="cta-wrap">
+                                <button class="cta-btn secondary button-small" data-toggle="modal" data-target=".bs-example-modal-lg"> Edit </button>
+                            </div>
+                            <div class="how-is-this hidden">
+                                <div class="row">
+                                    <div class="col-md-10 col-md-offset-1">
+                                        <p> 
+                                            This view shows the impact to your property's <strong>Net Operating Income (NOI = revenue minus expenses).</strong> 
+                                        </p>
+                                        <p> Mark up is the amount you charge each resident minus the amount we charge you. </p>
+                                        <p>
+                                            Here's an example: You are billed $12/month for valet trash service at your 300-unit property. Residents pay $25/month. Your net income is 300 units X ($25 - $12) = $3900/month. Valet trash is a cash flow positive service from Day 1!
+                                        </p>
+                                        <p>
+                                            You can earn additional income by charging for resident violations. For example, if there are 10 finable resident violations at $25 per violation each month, that's an additional $250/month in NOI. Some property managers view violations as an income generator. Other use it more for compliance. That's completely up to you.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="how-is-this-btn-wrap">
+                                <button class="how-is-this-btn btn" type="button"> How is this calculated? </button>
+                            </div>
+                        </div>
+                    </section>
+                </section>
+
+                <section class="col-md-5">
+                    <div class="section-liner how-can-we-help-you mb-20  hidden-xs hidden-sm">
+                        <a class="button-small mb-10 help-btn" href="{!URLFOR($Page.WK_ContactUs)}?Type=AlertWellKeptforHelp&Id={!accountId}">
+                            Alert WellKept for Help 
+                        </a> 
+                    </div>
+                    <div class="section-liner mb-20 upcoming-services-div" id="upcoming-services-div">
+                        <div class="row title-row">
+                            <div class="col-xs-9">
+                                <p class="mt-0 mb-5 upServTitle">Upcoming Services</p>  
+                            </div>
+                            <div class="col-xs-3">
+                                <a href="{!URLFOR($Page.WK_Reports)}?Type=Upcoming&id={!accountId}" class="secondary button-small view">View</a>
+                            </div>
+                        </div>
+                        <div class="upcoming-services" id="VertiHor">
+                            <div class="mb-10">
+                                <a href="{!URLFOR($Page.WK_Reports)}?Type=Services&id={!accountId}">VIEW HISTORY</a>
+                            </div>
+                            <div id="upcomingServicesList" >
+                            
+                            </div>
+                        </div>
+                        <div class="mobileView">
+                                <center>
+                                    <a href="{!URLFOR($Page.WK_Reports)}?Type=Upcoming&id={!accountId}" class="secondary button-small view">View</a>
+                                </center>
+                        </div>
+                    </div>
+                    <div class="section-liner">
+                        <p class="mt-0 mb-20 upServTitle">My Services <span>({!listfJasonServicesWrappersize})</span></p>
+                        <div class="pr-0 Service-Tab2">
+                            <div class="myServices" id="myServices">                           
+                                <apex:repeat value="{!listfJasonServicesWrapper}" var="serviceWrap">
+                                    <apex:outputPanel rendered="{!IF(serviceWrap.services != '',true,false)}" styleClass="list">  
+                                        <div class="row ml-5 serviceInfo">
+                                            <div class="col-sm-2 col-md-2  mr-10">
+                                                <div> 
+                                                    <img src="{!URLFOR($Resource.wkresources, 'icons/doortodoor.svg')}" type="image/svg+xml" class="service-icon" /> 
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-4 col-md-6">
+                                                <p class="servicTitle" title='{!serviceWrap.services}'>{!serviceWrap.services}</p>
+                                                <p class="servicTitledays">{!serviceWrap.frequency}</p>
+                                            </div>
+                                        </div>
+                                    </apex:outputPanel>
+                                </apex:repeat>
+                            </div>
+                        </div>
+                    </div>
+                   
+                    <section class="service-section">
+                        <div class="section-liner pb-0">
+                            <h3>Recommended Services</h3>
+                            <div class="swiper-container">
+                                <div id="swiper-wrapper-list" class="swiper-wrapper"></div>
+                            </div>
+                <!--//Priyanka Defect fix 9807-->
+                            <!-- Swiper Arrows -->
+                            <div class="swiper-button-next hidden-xs hidden-sm"></div>
+                            <div class="swiper-button-prev hidden-sm hidden-xs"></div>
+                            <!-- Swiper Pagination -->
+                            <div class="swiper-pagination visible-sm visible-xs"></div>
+                        </div>
+                    </section>
+                </section>
+            </div>
+             <section class="impact-to-net visible-sm visible-xs">
+                        <div class="section-liner">
+                            <h3 class="mediaPadd"> Impact to Net Operating Income From Valet Trash </h3>
+                            <div class="time-frame"> Last 30 days </div>
+                            <div class="row text-center">
+                                <div class="impact-total visible-sm visible-xs">
+                                    <span>$</span> 
+                                    <span id="impactTotalMobile" class="" data-total=""></span> 
+                                    <span id="mobileImpact" class="impactMobileTotalValue"></span>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <div class="row impact-graph">
+                                        <div class="col-md-10 col-xs-11">
+                                            <div class="impact-chart">
+                                                <div class="impact-valet-trash-bar impact-bar"> 
+                                                    <span>$</span>
+                                                    <span class="impact-valet-trash-value"></span> 
+                                                </div>
+                                                <div class="impact-valet-violation-bar impact-bar"> 
+                                                    <span>$</span>
+                                                    <span class="impact-valet-violation-value"></span> 
+                                                </div>
+                                                <div class="clearfix"></div>
+                                            </div>
+                                            <div class="valet-legend">
+                                                <div class="valet-key-item"> 
+                                                    <span class="valet-key key-square"></span> 
+                                                    Income from Valet Trash 
+                                                </div>
+                                                <div class="valet-key-item violation-legend-item"> 
+                                                    <span class="violation-key key-square"></span> 
+                                                    Income Opportunity From Violations 
+                                                </div>
+                                                <div class="clearfix"></div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-2 pl-0">
+                                            <div class="impact-total hidden-sm hidden-xs"> <span>$</span> <span id="impactTotal" class="odometer" data-total=""></span> </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="impact-keys">
+                                        <div class="impact-keys-liner">
+                                            <div class="key-row">
+                                                <!-- This value defines the value for 'Units'. Inject integer where data-units="...". -->
+                                                <span id="fromValetTrash" class="key-values" data-units="{!totalLineItemUnits}">{!totalLineItemUnits}</span> 
+                                                Units 
+                                            </div>
+                                            <div class="key-row">
+                                                <!-- This value defines the value for 'Monthly Resident Markup'. Inject integer where data-markup="...". -->
+                                                <span id="monthlyMarkup" class="key-values" data-markup="{!monthlyResMarkup}">${!monthlyResMarkup}</span> 
+                                                Monthly Resident Markup 
+                                            </div>
+                                            <div class="key-row">
+                                                <!-- This value defines the value for 'Violation Fine Amount'. Inject integer where data-units="...". -->
+                                                <span id="fromviolations" class="key-values" data-violation="{!vioFineAmount}">${!vioFineAmount}</span> 
+                                                Violation Fine Amount 
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="clearfix"></div>
+                            <div class="cta-wrap">
+                                <button class="cta-btn secondary button-small" data-toggle="modal" data-target=".bs-example-modal-lg"> Edit </button>
+                            </div>
+                            <div class="how-is-this hidden">
+                                <div class="row">
+                                    <div class="col-md-10 col-md-offset-1">
+                                        <p> 
+                                            This view shows the impact to your property's <strong>Net Operating Income (NOI = revenue minus expenses).</strong> 
+                                        </p>
+                                        <p> Mark up is the amount you charge each resident minus the amount we charge you. </p>
+                                        <p>
+                                            Here's an example: You are billed $12/month for valet trash service at your 300-unit property. Residents pay $25/month. Your net income is 300 units X ($25 - $12) = $3900/month. Valet trash is a cash flow positive service from Day 1!
+                                        </p>
+                                        <p>
+                                            You can earn additional income by charging for resident violations. For example, if there are 10 finable resident violations at $25 per violation each month, that's an additional $250/month in NOI. Some property managers view violations as an income generator. Other use it more for compliance. That's completely up to you.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="how-is-this-btn-wrap">
+                                <button class="how-is-this-btn btn" type="button"> How is this calculated? </button>
+                            </div>
+                        </div>
+                    </section>
+
+            <c:WK_FooterComponent ></c:WK_FooterComponent>
+        </div>
+
+
+        <div class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="section-liner">
+                        <h3> Edit Calculation </h3>
+                        <form id="editImpactCalc" action="post">
+                            <div class="col-md-11 col-md-offset-1">
+                                <div class="row">
+                                    <div class="calc-title"> Monthly Resident Markup </div> $
+                                    <input required="true" data-parsley-trigger="keyup" class="update-markup" type="number" name="update-markup" value="" min="1" maxlength="3" max="999" /> 
+                                </div>
+                                <div class="row">
+                                    <div class="calc-title"> Violation Fine Amount </div> $
+                                    <input required="true" data-parsley-trigger="keyup" class="update-fine" type="number" name="update-fine" value="" min="1" maxlength="3" max="999" /> 
+                                </div>
+                            </div>
+                            <div class="clearfix"></div>
+                            <div class="row modal-btns gutter-10">
+                                <div class="col-md-6">
+                                    <button type="button" class="secondary button-small" data-dismiss="modal" aria-label="Cancel"> Cancel </button>
+                                </div>
+                                <div class="col-md-6">
+                                    <button id="fineSave" class="primary button-small" type="submit"> save </button>
+                                </div>
+                            </div>
+                            
+                        </form>
+                        <apex:form >
+                            <apex:actionFunction name="updateFineAmountToAccount" action="{!updateVioMarkupToAcc}" reRender="finepanel mobileImpact">
+                                <apex:param name="updatedFine" assignTo="{!accViolationFineAmount}" value=""/>
+                                <apex:param name="updatedMarkup" assignTo="{!accMarkupFineAmount}" value=""/>
+                            </apex:actionFunction>
+                        </apex:form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="profile-window"></div>
+
+        <div id="service-box-modals"></div>
+
+        <apex:includeScript value="{!URLFOR($Resource.wk_services, 'service-boxes.js')}" />
+        <apex:includeScript value="{!URLFOR($Resource.wk_services, 'upcoming-services.js')}" />
+        <apex:includeScript value="{!URLFOR($Resource.wk_services, 'my-services.js')}" />
+
+        <script>
+            window.onload = function () {
+
+             //$('.impactMobileTotalValue').text($('#impactTotal')[0].odometer.value);  
+                 
+            if($('.swiper-container').hasClass('swiper-container-android') == true){
+               $('.swiper-container').removeClass('swiper-container-android');
+            }
+
+            $('#violations-chart').find('svg').each(function(){
+        
+               var svgHeight = $(this).attr("height");
+               var svgWidth = $(this).attr("width");  
+        
+               $(this).find("defs rect").each( function() {
+                    $(this).attr('width', svgWidth).attr('height', svgHeight); 
+               });
+               
+               var xAxisRect = $(this).find('clipPath[id$="-clip-xaxis"] > rect');
+               xAxisRect.attr('width', Number(xAxisRect.attr('width'))+20);
+            });
+        
+        };
+
+        
+            ! function($) {
+                'use strict';
+                // Check for Cookies
+                var data_markup_cookie = "{!accountId}.data-markup";
+                var data_violation_cookie = "{!accountId}.data-violation"
+
+                function readFromCookies() {
+                    /*Commented Values coming from cookies*/
+                    var dataMarkup = /*$.cookie(data_markup_cookie) ||*/ $('[data-markup]').attr('data-markup');
+                    var dataViolation = /*$.cookie(data_violation_cookie) ||*/ $('[data-violation]').attr('data-violation');
+
+                    $('[data-markup]').attr('data-markup', dataMarkup);
+                    $('[data-violation]').attr('data-violation', dataViolation);
+                    calculateImpact();
+                }
+                // Format large number to include comma.
+                function commaSeparateNumber(val) {
+                    while (/(\d+)(\d{3})/.test(val.toString())) {
+                        val = val.toString().replace(/(\d+)(\d{3})/, '$1' + ',' + '$2');
+                    }
+                    return val;
+                }
+                // Configure Impact Chart
+                function calculateImpact() {
+                    // Set violation count over the past 30 days.
+                   var totalPrevViol = {!listOfViolationForAvg};
+                    var
+                    // Grab data-* value
+                        units = $('#fromValetTrash').attr('data-units'), // Var from html value.
+                        monthlyMarkup = $('#monthlyMarkup').attr('data-markup'), // Var from html value.
+                        // Cost Variables
+                        violationFee = $('#fromviolations').attr('data-violation'), // Total Violations for the past 30 days.
+                        monthlyMarkupTotal = $('#monthlyMarkup').attr('data-markup'), // Mark Up Fee
+                        // Totals
+                        violationMonthlyTotal = violationFee * totalPrevViol,
+                        impactTotal = violationMonthlyTotal,
+                        impactTotalValue = units * monthlyMarkupTotal, // Percentage Calcs
+                        impactValetPercentage = impactTotalValue / (impactTotalValue + impactTotal) * 100, // NOI from Valet Trash Number
+                        impactValetPercentage = Math.ceil(impactValetPercentage),
+                        impactViolation = violationFee * totalPrevViol,
+                        impactOpportunityViolation = 100 - impactValetPercentage;
+                    // Animate Impact Graph
+                    setTimeout(function() {
+                        $('.impact-valet-violation-bar').css('width', impactOpportunityViolation + '%');
+                        $('.impact-valet-trash-bar').css('width', impactValetPercentage + '%');
+                    }, 500);
+                    setTimeout(function() {
+                        // Get Bar Widths
+                        var impactValetBarWidth = $('.impact-valet-violation-bar').width();
+                        var impactViolationBarWidth = $('.impact-valet-trash-bar').width();
+                        // Hide Numbers if less than 20%
+                        if (parseFloat(impactValetBarWidth) < parseFloat($('.impact-chart').width() * .20)) {
+                            $('.impact-valet-violation-bar span').hide();
+                        } else {
+                            $('.impact-valet-violation-bar span').show();
+                        }
+                        if (parseFloat(impactViolationBarWidth) < parseFloat($('.impact-chart').width() * .20)) {
+                            $('.impact-valet-trash-bar span').hide();
+                        } else {
+                            $('.impact-valet-trash-bar span').show();
+                        }
+                    }, 1500);
+                    // Change the value (inject then render)
+                    $('#fromValetTrash').attr('data-units', units).text(units);
+                    $('#monthlyMarkup').attr('data-markup', monthlyMarkup).text(monthlyMarkup).prepend('$');
+                    $('#fromviolations').attr('data-violation', violationFee).text(violationFee).prepend('$');
+                    // Total
+                    $('#impactTotal').attr('data-total', impactTotal).text(commaSeparateNumber(impactTotalValue + impactViolation));
+                    $('#impactTotalMobile').attr('data-total', impactTotal).text(commaSeparateNumber(impactTotalValue + impactViolation));
+            // Ashish 9780
+                    $('.impactMobileTotalValue').text(commaSeparateNumber(impactTotalValue + impactViolation));
+                    // Impact Valet Value
+                    $('.impact-valet-trash-value').text(commaSeparateNumber(impactTotalValue));
+                    // Impact Violation Value
+                    $('.impact-valet-violation-value').text(commaSeparateNumber(impactViolation));
+                    // Modal Calc Update
+                    $('.update-units').val(units);
+                    $('.update-markup').val(monthlyMarkup);
+                    $('.update-fine').val(violationFee);
+                    $.cookie(data_markup_cookie, monthlyMarkup, {
+                        expires: 365
+                    });
+                    $.cookie(data_violation_cookie, violationFee, {
+                        expires: 365
+                    });
+                } // End Impact Chart & calculateImpact();
+                function updateCalculation() {
+                    $('[data-units]').attr('data-units', $(".update-units").val());
+                    $('[data-markup]').attr('data-markup', $(".update-markup").val());
+                    $('[data-violation]').attr('data-violation', $(".update-fine").val());
+                    calculateImpact();
+                    $('.modal').modal('hide');
+                    return false;
+                }
+                // Toggle for "How this is calcutated?".
+                function showCalculationHelper() {
+                    $('.how-is-this').toggleClass('hidden');
+                    $('.how-is-this-btn').toggleClass('open');
+                    $(this).text(function(i, text) {
+                        return text === 'Close' ? 'How is this calcutated?' : 'Close';
+                    });
+                }
+             
+                function toggleServices() {
+                    // JSON for Services
+                    var JSONStringforServices = {!JSONStringforServices};
+                    // Iterate through JSON and create html.
+                    JSONStringforServices.forEach(function(service) {
+                        var element = $('#' + service.services);
+                        if (service.complete === true) {
+                            $(element).find('.service-item').removeClass('no-service');
+                            $(element).find('.service-days').html(service.frequency);
+                        } else {
+                            $(element).find('.service-item').addClass('no-service');
+                            $(element).find('.service-days').html("\u00A0");
+                        }
+                    });
+                }
+                // C3 Charting
+                var JSONStringforMap = [{
+                    "dateValues": "1988-12-21",
+                    "countValues": "2"
+                }, {
+                    "dateValues": "1988-12-22",
+                    "countValues": "1"
+                }, {
+                    "dateValues": "1988-12-23",
+                    "countValues": "4"
+                }, {
+                    "dateValues": "1988-12-24",
+                    "countValues": "8"
+                }, {
+                    "dateValues": "1988-12-25",
+                    "countValues": "6"
+                }];
+                // Configure Violation Chart
+                var config = {};
+                config.data = {};
+                config.axis = {};
+
+                if (checkZeroCountValues({!JSONStringforMap}) === false) {config.data.json = {!JSONStringforMap};
+                } else {
+                    config.data.json = [];
+                }
+
+                function checkZeroCountValues(JSONStringforMap) {
+                    var i, dataZero = true;
+                    for (i = 0; i < JSONStringforMap.length; i++) {
+                        if (JSONStringforMap[i].countValues !== "0.0") {
+                            dataZero = false;
+                        }
+                    }
+                    return dataZero;
+                }
+
+                config.data.empty = {
+                    label: {
+                        text: "No violations in the last 5 pickups"
+                    }
+                };
+                //config.data.json = {!JSONStringforMap};
+                config.data.type = 'bar';
+                config.bindto = '#violations-chart';
+                config.data.labels = true;
+                config.data.colors = {
+                    countValues: '#48ccff'
+                };
+                config.data.keys = {
+                    x: 'dateValues',
+                    value: ['countValues']
+                };
+                config.axis = {
+                    y: {
+                        show: false,
+                    },
+                    x: {
+                        type: 'category',
+                        tick: {
+                            centered: true,
+                            fit: true,
+                            format: function(x) {
+                                var paramDate = this.api.categories()[x].split('-');
+                                var date = new Date(paramDate[0], paramDate[1] - 1, paramDate[2]);
+                                return (date.getMonth() + 1) + '/' + date.getDate();
+                            }
+                        }
+                    }
+                };
+                config.bar = {
+                    width: {
+                        ratio: .7
+                    }
+                };
+                config.tooltip = {
+                    show: false
+                };
+                config.legend = {
+                    show: false
+                };
+                config.transition = {
+                    duration: 500
+                };
+                var chart = c3.generate(config);
+                
+
+                // Header Profile Toggle
+                // Header Profile Toggle
+                function toggleProfileMenu(event) {
+                    event.stopPropagation();
+                    $('.profile-dialog').toggleClass('toggled');
+                    $('.down-arrow').toggleClass('down-arrow-rotate');
+                    $('.profile-window').toggleClass('visible');
+                }
+
+                function mobileToggle() {
+                    $('body').toggleClass('mobile-menu-open');
+                    $('.bars').toggleClass('clicked');
+                    $('.mobile-menu').toggleClass('open menu-opened');
+                    $('.mobile-toggle').toggleClass('menu-opened');
+                }
+                $(document).ready(function() {
+                    function dataForScript() {
+                        window.location.href = "{!URLFOR($Page.WK_Reports)}?Type=Violations";
+                    }
+                    // Create Cookie
+                    readFromCookies();
+
+                    // Initialize Nice Select
+                    $('select').niceSelect();
+
+                    // Initialize parsley for validation.
+                    $('form').parsley();
+
+                    // Create C3 chart
+                    //createChart();
+                    // Create Swiper
+                    //createSwiper();
+
+                    // Listeners
+                    $('#editImpactCalc').submit(updateCalculation);
+                    $('.how-is-this-btn').click(showCalculationHelper);
+                    $('.profile-btn').click(toggleProfileMenu);
+                    $('.mobile-toggle').click(mobileToggle);
+
+                    $('.profile-window').click(function() {
+                        if ($('.profile-dialog').hasClass('toggled')) {
+                            $('.profile-dialog').removeClass('toggled');
+                            $('.down-arrow').removeClass('down-arrow-rotate');
+                            $('.dropdown').removeClass('open');
+                            $('.profile-window').removeClass('visible');
+                        }
+                    });
+
+                });
+                
+                $('#fineSave').on('click', function() {
+                    var updatedFine = $('.update-fine').val();
+                    var updatedMarkup = $('.update-markup').val();
+                    //alert('updatedFine-> '+updatedFine);
+                    //alert('updatedMarkup-> '+updatedMarkup);
+                    //console.log(updatedFine != null);
+                    //console.log(updatedFine != '');
+                    if(updatedFine != null && updatedFine != '' && updatedMarkup != null && updatedMarkup != '') {
+                      updateFineAmountToAccount(updatedFine,updatedMarkup);
+                    }
+                    $('.impactMobileTotalValue').text($('#impactTotal')[0].odometer.value);
+                });
+                
+                $(window).on('load', function() {
+                    // Check JSON one .ready() is done.
+                    toggleServices();
+                });
+            }(jQuery);
+
+
+
+
+        // services code
+
+
+        $( document ).ready(function() {
+            
+            var myServiceResources = {imageURL: '{!URLFOR($Resource.wkresources, "icons/")}'};
+            MyServices.init(myServiceResources);
+
+            var serviceCount={!JSONStringforServices}.length;
+            // Priyanka defect fix 9774
+            if(serviceCount==1){
+                $('.Service-Tab2').css("height"," 150px");
+                $('.upcoming-services').css("height","600px"); 
+                $('.Service-Tab2').css('overflow-y','hidden');
+               }
+              if(serviceCount==2 || serviceCount==3){
+            $('.Service-Tab2').css('overflow-y','hidden');
+              }  
+              
+            if(serviceCount>=4){
+                $('.Service-Tab2').css("height"," 175px");
+                 $('.Service-Tab2').css("overflow-y"," hidden");
+                $('.upcoming-services').css("height","275px"); 
+               $('#changePad').css('padding-bottom','35px');
+            }
+        });
+        
+
+
+
+
+
+        // Swiper Settings
+        function createSwiper() {
+            var appendNumber = 4;
+            var prependNumber = 1;
+            var swiper = new Swiper('.swiper-container', {
+                pagination: '.swiper-pagination',
+                nextButton: '.swiper-button-next',
+                prevButton: '.swiper-button-prev',
+                paginationClickable: true,
+                slidesPerView: 2,
+                spaceBetween: 10,
+                breakpoints: {
+                    991: {
+                        slidesPerView: 2
+                    }
+                }
+            });
+        }
+        // Swiper
+
+
+            var serviceStaticResources = {
+                iconURL: '{!URLFOR($Resource.wkresources, "icons/")}',
+                orderURL: {
+                    contact_us:'{!URLFOR($Page.WK_ContactUs)}?Type=<TYPE>&Id={!accountId}',
+                    junk_removal:'{!URLFOR($Page.WK_JunkRemovalPage)}?Id={!accountId}',
+                },
+                modalImgURL: '{!URLFOR($Resource.wkservicesImg, "services/")}'
+            };
+
+
+            var sl = new ServiceBoxList("swiper-wrapper-list", 'service-box-modals', serviceStaticResources);
+            sl.sortServiceList('{!JSONStringForRecommended}');
+            sl.initSwiper();
+            createSwiper();
+            
+            UpcomingServices.init('#upcomingServicesList', '{!upcjsonstring}');
+
+            $('body').on('touchstart', '.swiper-slide', function(){
+                $('.swiper-slide').find('.pop-up').hide();
+                $(this).find('.pop-up').toggle('show');
+            });
+            
+        </script>
+    </body>
+</apex:page>

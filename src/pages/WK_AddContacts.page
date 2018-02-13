@@ -1,0 +1,278 @@
+<apex:page docType="html-5.0" showHeader="false" standardStylesheets="false" sidebar="false" controller="WK_EditContactController" action="{!getAccountId}"> 
+    <head>
+      <meta name="viewport" content="initial-scale=1.0" />
+    <meta name="description" content="Wellkept Dashboard" />
+    <title>Add Contacts| Wellkept</title>
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:300,400,600,700" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css?family=Merriweather:300,400,700,900" rel="stylesheet" />
+    <apex:stylesheet value="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"/>
+    <apex:stylesheet value="{!URLFOR($Resource.wkresources, 'js/c3/c3.min.css')}"/>   
+    <apex:stylesheet value="{!URLFOR($Resource.wkresources, 'js/swiper/dist/css/swiper.min.css')}"/>
+    <apex:stylesheet value="{!URLFOR($Resource.wkresources, 'css/main.css')}"/>
+        
+    <apex:includeScript value="{!URLFOR($Resource.wkresources, 'js/jquery.min.js')}"  />   
+    <apex:includeScript value="{!URLFOR($Resource.wkresources, 'js/bootstrap/dist/js/bootstrap.min.js')}"  />
+    <apex:includeScript value="{!URLFOR($Resource.wkresources, 'js/jquery.nice-select.min.js')}" />
+    <apex:includeScript value="{!URLFOR($Resource.wkresources, 'js/swiper/dist/js/swiper.min.js')}" />
+    <apex:includeScript value="{!URLFOR($Resource.wkresources, 'js/d3/d3.min.js')}"/>
+    <apex:includeScript value="{!URLFOR($Resource.wkresources, 'js/c3/c3.min.js')}" />
+    <apex:includeScript value="{!URLFOR($Resource.wkresources, 'js/jquery.cookie/jquery.cookie.js')}" />
+    <apex:includeScript value="{!URLFOR($Resource.wkresources, 'js/parsleyjs/dist/parsley.min.js')}" />
+    <apex:includeScript value="{!URLFOR($Resource.wkresources, 'js/main.js')}" />
+    <apex:includeScript value="{!URLFOR($Resource.wkmaskedInput, 'jquery.maskedinput.min.js')}" />
+    <apex:includeScript value="{!URLFOR($Resource.wkmaskedInput, 'maskedFormats.js')}" />
+
+    <style>
+      .nice-select > span.placeholder{
+        font-style: italic;
+        color: #989898;
+      }
+      /*DE9793 Priyanka */
+      .value input, .value select, .value .nice-select {
+          font-weight:300 !important;
+      }
+     
+    </style>
+    <script type="text/javascript">
+        function saveConRecJS() {
+            var firstname = document.getElementById("fname").value;
+            var lastname = document.getElementById("lstname").value;
+            var MobilePhone = document.getElementById("mnumber").value;
+            
+            var OffPhone = document.getElementById("offnumber").value;
+            var email = document.getElementById("email").value;
+            var emerContact = document.getElementById("brand-checkbox").value;
+            
+            //alert('value of checkbox - > '+emerContact);
+            var contactType = document.getElementById("type-reviewed").value;
+            //alert('val -> '+contactType);
+            
+            saveUserDetails(firstname , lastname, MobilePhone, OffPhone, email, emerContact, contactType);   
+        }
+       
+    </script>
+    
+      <script>
+  
+        function cancelRedirect() {
+        // $("input").parsley().destroy();
+            cancelPage('{!accountId}');
+        }
+  </script>
+ </head>
+<body>
+     <!--header start-->
+<!-- DE9760 --> 
+     <c:WK_HeaderComponent title="{!$Label.WK_AddContactsLabel}" ></c:WK_HeaderComponent>
+  <apex:form styleClass="add-contact-form">
+  
+   
+    <!-- End Sub Header -->
+    <!--Violation Details Start-->
+    
+    <div class="container add-contact">
+    
+        <div class="col-md-8 col-md-offset-2">
+            <div class="page-header">
+                <h1 class="">
+                    Add Contact
+                </h1>
+            </div>
+           
+            <div class="row mt-25 edit-profile-section">
+                <div class="col-sm-3 col-sm-offset-1">
+                
+                </div>
+                
+                <div class="col-sm-6">
+                    <div class="label"> First Name </div>
+                        <div class="value">
+                        
+                        <apex:inputField value="{!contactRec.FirstName}"   id="fname" />
+                       <!-- <input type="text" name="first-name" placeholder="First Name" id="fname" required="true" />-->
+                       <ul class="parsley-errors-list filled" id="add-f-name" style="display:none">
+                           <li class="parsley-required">This value is required.</li>
+                       </ul>
+                       <!--<apex:pageMessages rendered="{!firstName}" />-->
+                    </div>
+                     <div class="label"> Last Name </div>
+                    <div class="value">
+                    <apex:inputText value="{!lastNameString}"  id="lstname" />
+                    <ul class="parsley-errors-list filled" id="add-l-name" style="display:none">
+                           <li class="parsley-required">This value is required.</li>
+                       </ul>
+                        <!--<apex:pageMessages rendered="{!lastName}" />-->
+                      <!--  <input type="text" name="last-name" placeholder="Last Name" id="lstname" required="true" />-->
+                    </div>
+                    <div class="label">Role</div>
+                    <div class="value mb-20">
+                    <apex:selectList value="{!selectedRole}" multiselect="false"  id="type-reviewed">
+                    <apex:selectOption itemValue="Please select the best option" itemLabel="Please select the best option"/>
+                    <apex:selectOptions value="{!getContTypePicklist}"/>
+                   
+                    </apex:selectList>
+                    <ul class="parsley-errors-list filled" id="add-role" style="display:none">
+                           <li class="parsley-required">This value is required.</li>
+                       </ul>
+                       <ul class="parsley-errors-list filled" id="select-format" style="display:none">
+                           <li class="parsley-required">Select a proper role.</li>
+                       </ul>
+                    <!--<apex:pageMessages rendered="{!selectRole}" />-->
+                       <!-- <select name="type-reviewed" id="type-reviewed">
+                          <option>Select Role</option>
+                          <apex:repeat value="{!getContTypePicklist}" var="pickVal">
+                              <option>{!pickVal.value}</option>
+                          </apex:repeat> 
+                          <!--
+                          <option>Role 1</option>
+                          <option>Role 2</option> 
+                        </select>-->
+                    </div>
+                   <div class="label"> Mobile# </div>
+                      <div class="value">
+                      <apex:inputField value="{!contactRec.MobilePhone}"  id="mnumber" styleClass="maskedPhone" />
+                      <ul class="parsley-errors-list filled" id="add-phone" style="display:none">
+                           <li class="parsley-required">This value is required.</li>
+                       </ul>
+                      <!--<apex:pageMessages rendered="{!phone}" />-->
+                      <!--  <input type="text" name="mobile-number" placeholder="Mobile #" id="mnumber" required="true" />-->
+                      </div>
+                        <div class="label"> Office # (optional) </div>    
+                      <div class="value">
+                      <apex:inputField value="{!contactRec.Phone}" id="offnumber"  styleClass="maskedPhone"/>
+                       <!-- <input type="text" name="office-number" placeholder="Office # (Optional)" id="offnumber" />-->
+                      </div>
+                      <div class="label"> Email </div>    
+                      <div class="value">
+                      <apex:inputText value="{!emailString}"  id="email" />
+                      <ul class="parsley-errors-list filled" id="add-email" style="display:none">
+                           <li class="parsley-required">This value is required.</li>
+                       </ul>
+                       <ul class="parsley-errors-list filled" id="email-format" style="display:none">
+                           <li class="parsley-required">Please enter a valid email</li>
+                       </ul>
+                      <!--<apex:pageMessages rendered="{!email}" />-->
+                       <!-- <input type="text" name="email" placeholder="Email" id="email" required="true" />-->
+                      </div>
+                     <div class="brand-checkbox">
+                      <apex:inputField value="{!contactRec.WK_Emergency_Contact__c}" label="Emergency" id="brand-checkbox" />
+                      
+                      <apex:outputLabel for="brand-checkbox" styleClass="checkbox-label"></apex:outputLabel>
+                      </div>
+                      <span class="checkbox-label">
+                          Emergency Contact
+                      </span>
+                      
+                       <!-- <input type="checkbox" value="None" id="brand-checkbox" name="check" />
+                        <label for="brand-checkbox"></label>-->
+                     <!-- </div>
+                      <span class="checkbox-label">
+                        Emergency Contact
+                      </span>-->
+                    </div>
+                    <div class="row">
+                      <div class="col-sm-8 col-sm-offset-3">
+                        <div class="text-center mt-40 mb-20 edit-btns">
+                          <div class="row gutter-10">
+                            <div class="col-sm-6 col-xs-6">
+                              <button class="secondary cancel button-small" onclick="cancelRedirect();return false;">
+                              Cancel
+                              </button>
+                              <apex:actionfunction name="cancelPage" action="{!cancelPage}" >
+                                   <apex:param name="accountId" assignTo="{!accountId}" value=""/>
+                            </apex:actionFunction>
+                                
+                            </div>
+                            <div class="col-sm-6 col-xs-6">
+                            <apex:commandButton styleClass="primary button-small" value="Save" action="{!createContactDetail}" />
+                             <!-- <button class="primary button-small" onclick="saveConRecJS();return false;">
+                              Save
+                              </button>-->
+                              <!-- saveUserDetails(firstname , lastname, MobilePhone, OffPhone, email, emerContact, contactType) -->
+                             
+                             <!--  <apex:actionFunction name="saveUserDetails" action="{!createContactDetail}">
+                                  <apex:param name="firstname"  value=""/>
+                                  <apex:param name="lastname"  value=""/>
+                                  <apex:param name="MobilePhone"  value=""/>
+                                  <apex:param name="OffPhone"  value=""/>
+                                  <apex:param name="email"  value=""/>
+                                  <apex:param name="emerContact"  value=""/>
+                                  <apex:param name="contactType"  value=""/>
+                              </apex:actionFunction>-->
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+              </div>
+            </div>
+          </div>
+  </apex:form>
+  <c:WK_FooterComponent ></c:WK_FooterComponent>
+  <div class="profile-window"></div>
+  
+  <script>
+  if({!firstName} == false) {
+  $("#add-f-name").css("display","none");
+  }
+  if({!firstName} == true) {
+  $("#add-f-name").css("display","block");
+  }
+  
+   if({!lastName}  == false) {
+  $("#add-l-name").css("display","none");
+  }
+  if({!lastName} == true){
+  $("#add-l-name").css("display","block");
+  }
+  
+   if({!selectRole} == false) {
+  $("#add-role").css("display","none");
+  }
+  if({!selectRole} == true) {
+  $("#add-role").css("display","block");
+  }
+  
+   if({!phone} == false) {
+  $("#add-phone").css("display","none");
+  }
+  if({!phone} == true) {
+  $("#add-phone").css("display","block");
+  }
+  
+  if({!email} == false) {
+  $("#add-email").css("display","none");
+  }
+  if({!email} == true) {
+  $("#add-email").css("display","block");
+  }
+  if({!emailFormat} == false) {
+  $("#email-format").css("display","none");
+  }
+  if({!emailFormat} == true) {
+  $("#email-format").css("display","block");
+  }
+  if({!selectProperRole} == false) {
+  $("#select-format").css("display","none");
+  }
+  if({!selectProperRole} == true) {
+  $("#select-format").css("display","block");
+  }
+
+
+ 
+  $(document).ready(function(){
+    initMaskedFormats();
+    if($('.nice-select span.current').html() == "")
+        $('.nice-select span.current').html('').addClass('placeholder');
+    
+    $("[id$='type-reviewed']").change(function(){
+      $('.nice-select span.current').removeClass('placeholder');
+    });
+
+  });
+  
+  
+  </script>
+</body>
+</apex:page>

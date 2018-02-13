@@ -1,0 +1,1044 @@
+<apex:page docType="html-5.0" showHeader="false" standardStylesheets="false" sidebar="false" controller="WK_ReportsController">
+
+    <head>
+        <meta name="viewport" content="initial-scale=1.0" />
+        <meta name="description" content="Wellkept Dashboard" />
+        <title>Reports | Wellkept</title>
+        <meta name="format-detection" content="telephone=no" />
+        <link href="https://fonts.googleapis.com/css?family=Montserrat:300,400,600,700" rel="stylesheet" />
+        <link href="https://fonts.googleapis.com/css?family=Merriweather:300,400,700,900" rel="stylesheet" />
+        <apex:stylesheet value="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" />
+        <apex:stylesheet value="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.11.1/bootstrap-table.min.css" />
+        <apex:stylesheet value="{!URLFOR($Resource.wkresources, 'css/main.css')}" />
+        <apex:stylesheet value="{!URLFOR($Resource.wkresources, 'js/air-datepicker/dist/css/datepicker.min.css')}" />
+
+        <apex:includeScript value="{!URLFOR($Resource.wkresources, 'js/jquery.min.js')}" />
+        <apex:includeScript value="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.11.1/bootstrap-table.min.js" />
+        <apex:includeScript value="{!URLFOR($Resource.wkresources, 'js/jquery.nice-select.min.js')}" />
+        <apex:includeScript value="{!URLFOR($Resource.wkresources, 'js/bootstrap/dist/js/bootstrap.min.js')}" />
+        <apex:includeScript value="{!URLFOR($Resource.wkresources, 'js/swiper/dist/js/swiper.min.js')}" />
+        <apex:includeScript value="{!URLFOR($Resource.wkresources, 'js/d3/d3.min.js')}" />
+        <apex:includeScript value="{!URLFOR($Resource.wkresources, 'js/c3/c3.min.js')}" />
+        <apex:includeScript value="{!URLFOR($Resource.wkresources, 'js/jquery.cookie/jquery.cookie.js')}" />
+        <apex:includeScript value="{!URLFOR($Resource.wkresources, 'js/parsleyjs/dist/parsley.min.js')}" />
+        <!-- <apex:includeScript value="{!URLFOR($Resource.wkresources, 'js/main.js')}" /> -->
+        <apex:includeScript value="{!URLFOR($Resource.wkresources, 'js/air-datepicker/dist/js/datepicker.min.js')}" />
+        <apex:includeScript value="{!URLFOR($Resource.wkresources, 'js/air-datepicker/dist/js/i18n/datepicker.en.js')}" />
+        <apex:includeScript value="{!URLFOR($Resource.wkresources, 'js/moment/min/moment.min.js')}" />
+        <style>
+            .dropdown-menu>li>a {
+                font-weight: 100;
+                padding: 0px 0px !important;
+            }
+
+            .dropdown-menu {
+                padding-left: 2px !important;
+            }
+
+            .form-control[readonly] {
+                background-color: #fff !important;
+            }
+
+
+
+
+            .pull-right.search input {
+                text-transform: capitalize;
+            }
+
+            .col-md-1 {
+                width: 15.333333% !important;
+            }
+
+            .search-icon-span {
+                top: 0px;
+                position: relative;
+            }
+
+            .pull-right.search input {
+                border-bottom: solid 1px #6e6e6e;
+            }
+
+            @media only screen and (max-width: 991px) {
+
+                /*DE9805 priyanka*/
+                .rptMbl {
+                    margin-bottom: 30px;
+                }
+                /*DE9805 priyanka*/
+                .toolbar-wrap>.row,
+                .search-wrap>.row,
+                .search-mobile>.row {
+                    margin-top: -422px !important;
+                }
+            }
+
+            @media only screen and (min-device-width: 1024px) and (max-device-width: 1366px) {
+                .button-small {
+                    padding: 14px 15px !important;
+                }
+            }
+
+            @media (min-width: 768px) and (max-width: 1024px) {
+                .viewMobile {
+                    position: absolute;
+                    bottom: 200px;
+                }
+                .rangeMobile {
+                    padding-top: 100px;
+                }
+
+            }
+
+            @media (min-width: 320px) and (max-width: 480px) {
+                /*DE9805 priyanka start*/
+                .bottomMrg {
+                    margin-bottom: 100px;
+                }
+                .paddMobile {
+                    padding-top: 50px;
+                }
+                .margMob {
+                    margin-bottom: 50px;
+                }
+                /*DE9805 priyanka end*/
+                .viewMobile {
+                    position: absolute;
+                    bottom: 207px;
+                }
+                .rangeMobile {
+                    padding-top: 100px;
+                }
+
+                .fixed-table-toolbar {
+                    display: none;
+                }
+
+                .form-control[readonly],
+                fieldset[disabled] .form-control {
+                    background-color: rgb(10, 62, 103) !important;
+                }
+
+
+                .bootstrap-table .table>thead>tr>th,
+                .th-inner {
+
+                    padding: 1px 16px 0px 5px !important;
+
+                }
+                .upComeValue .current {
+                    color: #fff;
+                }
+
+
+            }
+        </style>
+    </head>
+    <script>
+        /*window.onload = function(){
+                        fetchFields('{!duration}');
+                    }
+                      function fetchFields(val){
+                       if(val == 'Select Date Range') {
+                           document.getElementById('select-date-fields').style.display= 'block';
+                           $(".datepicker-start").attr('required',true);
+                          $(".datepicker-end").attr('required',true);
+                       }
+                       else {
+                           document.getElementById('select-date-fields').style.display= 'none';
+                           $(".datepicker-start").removeAttr('required',true);
+                          $(".datepicker-end").removeAttr('required',true);
+                       }
+                      }
+
+                    /*
+                    function exportDetails(){
+                            window.open('{!URLFOR($Page.WK_ExportToExcel)}?param1={!selectedType}&param2={!duration}&param3={!startDate}&param4={!endDate}');
+                        }
+                    */
+        /*function exportDetails(){
+                window.open('{!URLFOR($Page.WK_exportToCSV)}?param1={!selectedType}&param2={!duration}&param3={!startDate}&param4={!endDate}&Id={!accountId}');
+            }
+        function exportDetailsToPDF(){
+                window.open('{!URLFOR($Page.WK_ExportToPDF)}?param1={!selectedType}&param2={!duration}&param3={!startDate}&param4={!endDate}');
+            }
+        function printingTheRecs(){
+                window.open('{!URLFOR($Page.WK_PrintingVioRecs)}?param1={!selectedType}&param2={!duration}&param3={!startDate}&param4={!endDate}&Id={!accountId}');
+            }
+        function navigationToVioRecJS(val) {
+        if(val != null && val != '') {
+        alert('Hi');
+            window.open('{!URLFOR($Page.WK_ViolationDetail)}?name=val&accntId={!accountId}');
+            
+        }
+        }
+        function navigationToReport(){
+            navigationToReportOptionPage();
+        }
+        function printJS() {
+        window.print();
+        }*/
+    </script>
+
+    <body>
+        <!-- DE9760 -->
+        <c:WK_HeaderComponent title="{!$Label.WK_ReportsLabel}"></c:WK_HeaderComponent>
+        <apex:form styleClass="form-horizontal" id="formId">
+            <!--   <apex:inputHidden value="{!accountId}" id="Id"/> -->
+
+            <apex:actionFunction action="{!navigateToVioRec}" name="navigationToVioRecAF" reRender="formId">
+                <apex:param name="violationName" assignTo="{!violationName}" value="" />
+                <apex:param name="accountId" assignTo="{!accountId}" value="" />
+            </apex:actionFunction>
+            <apex:actionFunction action="{!runReport}" name="navigationToReportOptionPage" reRender="formId">
+                <apex:param name="accountId" assignTo="{!accountId}" value="" />
+            </apex:actionFunction>
+            <apex:actionFunction action="{!navigateToInquiryDetails}" name="navigatetoinquiryAction" reRender="formId">
+                <apex:param name="inquiryid" assignTo="{!selectedInquiryId}" value="" />
+                <apex:param name="accountid" assignTo="{!accId2}" value="{!accId}" />
+                <apex:param name="retURL" assignTo="{!returnURL}" value="{!$CurrentPage.URL}" />
+            </apex:actionFunction>
+            <div class="container">
+                <div class="page-header hidden-sm hidden-xs">
+                    <h1>
+                        Reports
+                    </h1>
+                </div>
+            </div>
+
+            <!--reports-container-->
+            <!--filters-start-->
+            <div class="toolbar-wrap container" style="position:relative;">
+                <div class="row mt-20 mr-0 ml-0 mb-10">
+                    <div id="toolbar" class="toolbar form-horizontal">
+
+                        <div class="col-md-4 pl-0 form-group mr-0 ml-0">
+                            <label for="report-type" class="pb-0">
+                                TYPE
+                            </label>
+
+                            <div class="value">
+                                <apex:selectList styleClass="form-control" id="report-type" value="{!selectedType}" onchange="fetchPicklist(this.value);" size="1">
+                                    <apex:selectOptions value="{!getReportTypePicklist}" />
+                                    <!-- <apex:selectOption itemValue="Closed Inquiries" itemLabel="Closed Inquiries"/>
+                                 <apex:selectOption itemValue="5-Day Violation Tracking System" itemLabel="5-Day Violation Tracking System"/>
+                                 <apex:selectOption itemValue="Open Inquiries" itemLabel="Open Inquiries"/>
+                                <apex:selectOption itemValue="Service History" itemLabel="Service History"/>
+                                <apex:selectOption itemValue="Upcoming Services" itemLabel="Upcoming Services"/>
+                                 <apex:selectOption itemValue="Valet Trash Check-in/Check-out" itemLabel="Valet Trash Check-in/Check-out"/>
+                                 <apex:selectOption itemValue="Valet Trash Violations" itemLabel="Valet Trash Violations"/>-->
+                                </apex:selectList>
+                            </div>
+
+                        </div>
+
+
+                        <div class="col-md-4 form-group mr-0 ml-0" id="reportMob">
+                            <label for="select-duration" class="pb-0">DURATION</label>
+                            <div class="value">
+                                <apex:outputPanel id="otherServices" styleClass="otherServices">
+                                    <apex:selectList styleClass="form-control select-duration" id="select-duration" onchange="fetchFields(this.value);" value="{!duration}" size="1">
+                                        <apex:selectOptions value="{!getReportDurationPicklist}" />
+                                        <!-- <apex:selectOption itemValue="Yesterday" itemLabel="Yesterday"/>
+                                <apex:selectOption itemValue="Last 7 Days" itemLabel="Last 7 Days"/>
+                                <apex:selectOption itemValue="Last 30 Days" itemLabel="Last 30 Days"/>                              
+                                <apex:selectOption itemValue="Last 60 Days" itemLabel="Last 60 Days"/>
+                                <apex:selectOption itemValue="Last 90 Days" itemLabel="Last 90 Days"/>
+                                <apex:selectOption itemValue="Last 12 months" itemLabel="Last 12 months"/>
+                                <apex:selectOption itemValue="Select Date Range" itemLabel="Select Date Range"/>-->
+                                    </apex:selectList>
+                                </apex:outputPanel>
+                                <apex:outputPanel id="upcomingServices" styleClass="upcomingServices" style="display:none">
+                                    <apex:selectList value="{!durationForUpcoming}" id="upComeValue" styleClass="upComeValue" size="1" onchange="fetchFields(this.value);">
+                                        <apex:selectOptions value="{!getReportUSDurationPicklist}" />
+                                        <!--<apex:selectOption itemValue="Next 30 Days" itemLabel="Next 30 Days"/>
+                                <apex:selectOption itemValue="Select Date Range" itemLabel="Select Date Range"/> -->
+                                    </apex:selectList>
+                                </apex:outputPanel>
+                            </div>
+                        </div>
+
+
+
+                        <!--MOBILE filters-start-->
+                        <!-- <div class="search-wrap search-mobile hidden">
+                            <div class="form-group pull-left col-md-3">
+                                <div class="row gutter-10">
+                                    <div class="col-xs-1">
+                                        <span class="search-icon-span">
+                                            <img src="{!URLFOR($Resource.wkresources, 'icons/search.svg')}" />
+                                        </span>
+                                    </div>
+                                      <div class="col-xs-11">
+                                        <div class="value search-value">
+                                            <input type="text" class="search-report search-form-input form-control" placeholder="Search" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>-->
+                        <!--  <div class="row mb-10 visible-xs visible-sm">
+                            <div class="col-md-6 pl-0 date-pickers" id="select-date-fields" style="display:none;">
+                                    <!-- <apex:form styleClass="form-horizontal"> -->
+                        <!--             <div classs="row">
+                                           <div class="col-xs-6" id="SelectStartDate1">
+                                                <label for="select-duration" class="pb-0">Start</label>
+                                                <apex:input type="text" label="Start" value="{!startDate}" styleClass="form-control datepicker-start" />
+                                           </div>
+                                           <div class="col-xs-6" id="SelectEndDate1">
+                                                <label for="select-duration" class="pb-0">End</label>
+                                                <apex:input type="text" label="Start" value="{!endDate}" styleClass="form-control datepicker-end" />
+                                           </div>
+                                       </div>
+                                </div>
+                        </div>-->
+
+                        <div class="col-md-4 pl-0 pr-0 text-right form-group mr-0 ml-0 runReportMobVw">
+                            <div class="row gutter-10">
+                                <div class="col-md-5 rptMbl">
+                                    <!--9805 priyanka-->
+                                    <apex:commandButton styleClass="primary button-small mr-15" value="RUN REPORT" action="{!runReport}" reRender="globalPanel,upcomingServiceId,trashId,DayId,checkInId,serviceId,script,exportPanel,display1">
+                                    </apex:commandButton>
+                                    <!--     <apex:commandLink  styleClass="primary button-small mr-15" value="RUN REPORT" onclick="navigationToReport();return false" action="{!runReport}" >
+                                           <apex:param name="Id" value="{!accountId}"  />
+                                    </apex:commandLink> -->
+                                </div>
+                                <div class="col-md-4">
+                                    <apex:outputPanel id="exportPanel">
+                                        <span class="dropdown">
+                                    <apex:commandButton styleClass="secondary button-small dropdown-toggle" id="download-options" value="EXPORT"></apex:commandButton>
+                                     <ul class="dropdown-menu"  type="button" role="menu" aria-labelledby="download-options">
+                                            <li role=""> <apex:commandLink style="color:#000000" tabindex="0"  value="Report (CSV)" onclick="exportDetails();return false;"/></li>
+                                            <apex:outputPanel rendered="{!IF(OR(selectedType=='Valet Trash Violations',selectedType == '5-Day Violation Tracking System'), true, false)}">
+                                            <li class="" role=""> <apex:commandLink style="color:#000000" tabindex="1"  value="Violation Details (PDF)" onclick="printingTheRecs();return false;"/> </li>
+                                             </apex:outputPanel>
+                                        </ul>
+                                    </span>
+                                    </apex:outputPanel>
+                                </div>
+                                <!--<div class="col-md-3 hidden-sm hidden-xs">
+                                <apex:outputPanel rendered="{!IF(selectedType=='Valet Trash Violations', true, false)}">
+                                 <apex:commandButton styleClass="primary button-small mr-15" value="Print" onclick="printingTheRecs();return false;" ></apex:commandButton>
+                                </apex:outputPanel>
+                                </div> -->
+                            </div>
+                        </div>
+
+
+                        <!--</apex:form>-->
+                        <button type="button" class="secondary close-report-options hidden" onclick="return: false;">
+                        Close
+                    </button>
+                    </div>
+                </div>
+
+                <div class="row viewMobile">
+                    <div class="col-md-6 pl-0 date-pickers" id="select-date-fields-desk" style="display:none;">
+                        <!-- <apex:form styleClass="form-horizontal"> -->
+                        <div classs="row">
+                            <div class="col-xs-6" id="SelectStartDate">
+                                <label for="select-duration" class="pb-0">Start</label>
+                                <apex:input type="text" html-readonly="true" label="Start" value="{!startDate}" styleClass="form-control datepicker-start" />
+                            </div>
+                            <div class="col-xs-6" id="SelectEndDate">
+                                <label for="select-duration" class="pb-0">End</label>
+                                <apex:input type="text" html-readonly="true" label="Start" value="{!endDate}" styleClass="form-control datepicker-end" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+
+
+
+            <!--filters-start-->
+            <!--table-start-->
+            <!--<div class="container hidden-sm hidden-xs">
+            <div class="search-wrap row mb-10">
+                <div class="form-group pull-left col-md-3">
+                    <div class="row gutter-10">
+                        <div class="col-md-1">
+                            <span class="search-icon-span">
+                                <img src="{!URLFOR($Resource.wkresources, 'icons/search.svg')}" />
+                            </span>
+                        </div>
+                          <div class="col-md-11">
+                            <div class="value search-value">
+                                <input type="text" class="search-report search-form-input form-control" placeholder="Search" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>-->
+
+
+            <div class="container">
+                <button type="button" class="secondary report-options visible-xs visible-sm" onclick="">
+                Report Options
+            </button>
+            </div>
+
+            <apex:outputPanel id="display1" styleClass="container">
+                <div class="page-header-mobile visible-sm visible-xs">
+                    <h1>
+                        {!selectedType} </h1>
+                    <div class="last-thirty-days">
+                        {!duration}
+                    </div>
+                </div>
+            </apex:outputPanel>
+
+            <!-- <apex:outputPanel rendered="{!IF(listOfViolationWrapper.size > 0, true, false)}">  -->
+            <!--   <apex:outputPanel id="reportId">  -->
+            <div class="container table-wrap">
+                <div class="row">
+                    <div class="col-md-12 table-liner">
+                        <apex:outputPanel id="globalPanel">
+
+                            <apex:outputPanel id="trashId" rendered="{!IF(listOfViolationWrapper != null && listOfViolationWrapper.size > 0, true, false)}">
+                                <table id="table" class="results table" data-toggle="table" data-pagination="true" data-page-list="[10, 50, All]">
+                                    <thead>
+                                        <tr>
+                                            <th data-sortable="true">Date Reported</th>
+                                            <!--  <th data-sortable="true">Building #</th> -->
+                                            <th data-sortable="true">Unit #</th>
+                                            <th data-sortable="true">Violation #</th>
+                                            <th data-sortable="true">Violation Type</th>
+                                            <th data-sortable="true">Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <apex:repeat value="{!listOfViolationWrapper}" var="objWrapper" id="repeatId">
+                                            <tr>
+                                                <td>{!objWrapper.createdDate}</td>
+                                                <!--   <td>{!objWrapper.vioBuildingName}</td> -->
+                                                <td>{!objWrapper.vioUnit}</td>
+                                                <!-- <td><apex:commandLink value="{!objWrapper.vioName}"  onclick="navigationToVioRecJS('{!objWrapper.vioName}');return false"/></td> -->
+                                                <!-- <td><a href="{!URLFOR($Page.WK_ViolationDetail)}?accntId={!accountId}&name={!objWrapper.vioName}" onclick="paginationJS('{!objWrapper.vioName}')">{!objWrapper.vioName}</a></td> -->
+
+                                                <td><a style="cursor: pointer;" onclick="paginationJS('{!objWrapper.vioName}')">{!objWrapper.vioName}</a></td>
+
+                                                <td>{!objWrapper.vioType}</td>
+                                                <td>{!objWrapper.vioStatus}</td>
+                                            </tr>
+                                        </apex:repeat>
+                                    </tbody>
+                                </table>
+                            </apex:outputPanel>
+                            <apex:outputPanel id="DayId" rendered="{!IF(listOf5DayViolationsWrapper != null && listOf5DayViolationsWrapper.size > 0, true, false)}">
+                                <table id="table" class="results table" data-toggle="table" data-pagination="true" data-page-list="[10, 50, All]">
+                                    <thead>
+                                        <tr>
+                                            <th data-sortable="true">Date Reported</th>
+                                            <th data-sortable="true">Unit #</th>
+                                            <th data-sortable="true">Violation #</th>
+                                            <th data-sortable="true">Violation Type</th>
+                                            <th data-sortable="true">Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <apex:repeat value="{!listOf5DayViolationsWrapper}" var="obj5wrapper" id="repeatId5d">
+                                            <tr>
+                                                <td>{!obj5wrapper.createdDate}</td>
+                                                <td>{!obj5wrapper.vioUnit}</td>
+                                                <!-- <td><apex:commandLink value="{!obj5wrapper.vioName}" onclick="navigationToVioRecJS('{!obj5wrapper.vioName}');return false"/></td> -->
+                                                <!-- <td><a href="{!URLFOR($Page.WK_ViolationDetail)}?accntId={!accountId}&name={!obj5wrapper.vioName}">{!obj5wrapper.vioName}</a></td> -->
+
+                                                <td><a style="cursor: pointer;" onclick="paginationJS('{!obj5wrapper.vioName}')">{!obj5wrapper.vioName}</a></td>
+
+                                                <td>{!obj5wrapper.vioType}</td>
+                                                <td>{!obj5wrapper.vioStatus}</td>
+                                            </tr>
+                                        </apex:repeat>
+                                    </tbody>
+                                </table>
+                            </apex:outputPanel>
+                            <apex:outputPanel id="checkInId" rendered="{!IF(listOfCheckinWrapper != null && listOfCheckinWrapper.size > 0, true, false)}">
+                                <table id="table" class="results table" data-toggle="table" data-pagination="true" data-page-list="[10, 50, All]">
+
+                                    <thead>
+                                        <tr>
+                                            <th data-sortable="true">Appointment Number</th>
+                                            <th data-sortable="true">Date</th>
+                                            <th data-sortable="true">Team In</th>
+                                            <th data-sortable="true">Team Out</th>
+                                            <th data-sortable="true">Duration (hours)</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <apex:repeat value="{!listOfCheckinWrapper}" var="objCheckinWrapper" id="repeatId2">
+                                            <tr>
+                                                <td>{!objCheckinWrapper.checkInAppointmentNumb}</td>
+                                                <td>{!objCheckinWrapper.checkInSchDate}</td>
+                                                <td>{!objCheckinWrapper.checkInTeamIn}</td>
+                                                <td>{!objCheckinWrapper.checkInTeamOut}</td>
+                                                <td>{!objCheckinWrapper.checkInDuration}</td>
+                                            </tr>
+                                        </apex:repeat>
+                                    </tbody>
+                                </table>
+                            </apex:outputPanel>
+
+                            <apex:outputPanel id="serviceId" rendered="{!IF(listOfServiceHistoryWrapper != null && listOfServiceHistoryWrapper.size > 0, true, false)}">
+                                <table id="table" class="results table" data-toggle="table" data-pagination="true" data-page-list="[10, 50, All]">
+
+                                    <thead>
+                                        <tr>
+                                            <th data-sortable="true">Appointment #</th>
+                                            <th data-sortable="true">Date</th>
+                                            <th data-sortable="true">Scheduled Start Time</th>
+                                            <th data-sortable="true">Service</th>
+                                            <th data-sortable="true">Status</th>
+                                        </tr>
+                                    </thead>
+
+                                    <tbody>
+                                        <apex:repeat value="{!listOfServiceHistoryWrapper}" var="objServiceHistoryWrapper" id="repeatId3">
+                                            <tr>
+                                                <td>{!objServiceHistoryWrapper.serviceAppAppointNo}</td>
+                                                <td>{!objServiceHistoryWrapper.serviceAppSchDate}</td>
+                                                <td>{!objServiceHistoryWrapper.serviceAppSchTime}</td>
+                                                <td>{!objServiceHistoryWrapper.serviceAppService}</td>
+                                                <td>{!objServiceHistoryWrapper.serviceAppStatus}</td>
+                                            </tr>
+                                        </apex:repeat>
+                                    </tbody>
+                                </table>
+                            </apex:outputPanel>
+                            <apex:outputPanel id="upcomingServiceId" rendered="{!IF(upcomingServicesWrapperList != null && upcomingServicesWrapperList.size > 0, true, false)}">
+                                <table id="table" class="results table" data-toggle="table" data-pagination="true" data-page-list="[10, 50, All]">
+
+                                    <thead>
+                                        <tr>
+                                            <th data-sortable="true">Appointment Number</th>
+                                            <th data-sortable="true">Date</th>
+                                            <th data-sortable="true">Scheduled Start Time</th>
+                                            <th data-sortable="true">Service</th>
+                                            <th data-sortable="true">Status</th>
+                                        </tr>
+                                    </thead>
+
+                                    <tbody>
+                                        <apex:repeat value="{!upcomingServicesWrapperList}" var="objServiceHistoryWrapper" id="repeatId4">
+                                            <tr>
+                                                <td>{!objServiceHistoryWrapper.serviceAppAppointNo}</td>
+                                                <td>{!objServiceHistoryWrapper.serviceAppSchDate}</td>
+                                                <td>{!objServiceHistoryWrapper.serviceAppSchTime}</td>
+                                                <td>{!objServiceHistoryWrapper.serviceAppService}</td>
+                                                <td>{!objServiceHistoryWrapper.serviceAppStatus}</td>
+                                            </tr>
+                                        </apex:repeat>
+                                    </tbody>
+                                </table>
+                            </apex:outputPanel>
+                            <!-- Closed inquiries table begin -->
+                            <apex:outputPanel rendered="{!IF(listClosedInquiriesWrapper != null && listClosedInquiriesWrapper.size > 0, true, false)}">
+
+                                <table id="table" class="results table" data-toggle="table" data-pagination="true" data-page-list="[10, 50, All]">
+                                    <thead>
+                                        <tr>
+                                            <th data-sortable="true">Created Date</th>
+                                            <th data-sortable="true">Inquiry #</th>
+                                            <th data-sortable="true">Type</th>
+                                            <th data-sortable="true">Sub-Type</th>
+                                            <th data-sortable="true">Closed Date</th>
+                                            <th data-sortable="true">Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <apex:repeat value="{!listClosedInquiriesWrapper}" var="closedInqWrapper" id="repeatClosedInq">
+                                            <tr>
+                                                <td>{!closedInqWrapper.inquiryCreatedDate}</td>
+
+                                                <!--  <td><a href="{!URLFOR($Page.WK_inquiryDetails)}?accntId={!accountId}&name={!closedInqWrapper.inquirySFId}">{!closedInqWrapper.inquiryNumber}</a></td> -->
+
+                                                <td><a style="cursor: pointer;" onclick="paginationJS('{!closedInqWrapper.inquirySFId}')">{!closedInqWrapper.inquiryNumber}</a></td>
+
+                                                <!--<td><apex:commandLink value="{!closedInqWrapper.inquiryNumber}" onclick="navigatetoinquiry('{!closedInqWrapper.inquirySFId}')" rerender=""/></td>-->
+                                                <td>{!closedInqWrapper.inquiryType}</td>
+                                                <td>{!closedInqWrapper.inquirySubType}</td>
+                                                <td>{!closedInqWrapper.inquiryClosedDate}</td>
+                                                <td>{!closedInqWrapper.inquiryStatus}</td>
+                                            </tr>
+                                        </apex:repeat>
+                                    </tbody>
+                                </table>
+                            </apex:outputPanel>
+                            <!-- CLosed inquiries table end -->
+                            <!-- Open inquiries table begin -->
+                            <apex:outputPanel rendered="{!IF(listOpenInquiriesWrapper != null && listOpenInquiriesWrapper.size > 0, true, false)}">
+                                <table id="table" class="results table" data-toggle="table" data-pagination="true" data-page-list="[10, 50, All]">
+                                    <thead>
+                                        <tr>
+                                            <th data-sortable="true">Created Date</th>
+                                            <th data-sortable="true">Inquiry #</th>
+                                            <th data-sortable="true">Type</th>
+                                            <th data-sortable="true">Sub-Type</th>
+                                            <th data-sortable="true">Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <apex:repeat value="{!listOpenInquiriesWrapper}" var="openInqWrapper" id="repeatOpenInq">
+                                            <tr>
+                                                <td>{!openInqWrapper.inquiryCreatedDate}</td>
+                                                <!-- <td><a href="{!URLFOR($Page.WK_inquiryDetails)}?accntId={!accountId}&name={!openInqWrapper.inquirySFId}">{!openInqWrapper.inquiryNumber}</a></td> -->
+
+                                                <td><a style="cursor: pointer;" onclick="paginationJS('{!openInqWrapper.inquirySFId}')">{!openInqWrapper.inquiryNumber}</a></td>
+
+                                                <!-- <td><apex:commandLink value="{!openInqWrapper.inquiryNumber}" onclick="navigatetoinquiry('{!openInqWrapper.inquirySFId}')" rerender=""/></td> -->
+
+                                                <!--  <td><a href="{!URLFOR($Page.WK_InquiryDetails)}?Id={!accId}&cid={!selectedInquiryId}&retURL={{!$CurrentPage.URL}}">{!openInqWrapper.inquiryNumber}</a></td> -->
+
+                                                <td>{!openInqWrapper.inquiryType}</td>
+                                                <td>{!openInqWrapper.inquirySubType}</td>
+                                                <td>{!openInqWrapper.inquiryStatus}</td>
+                                            </tr>
+                                        </apex:repeat>
+                                    </tbody>
+                                </table>
+                            </apex:outputPanel>
+                            <!-- Open inquiries table end -->
+                        </apex:outputPanel>
+                    </div>
+                </div>
+            </div>
+            <!--    </apex:outputPanel> -->
+            <div class="profile-window"></div>
+            <!--    </apex:outputPanel> -->
+            <!--table-start-->
+        </apex:form>
+        <c:WK_FooterComponent ></c:WK_FooterComponent>
+        <!--reports-container-->
+        <apex:outputPanel id="script">
+            <script>
+                function paginationJS(vioname) {
+                    var $table = $('#table');
+                    // $table.bootstrapTable('selectPage', 1);  // Select Page number 
+
+                    //Get the options and there is the page number
+                    var options = $table.bootstrapTable('getOptions');
+
+                    //Get the page number
+                    var pageNumber = options.pageNumber;
+                    var accountid = '{!accountId}';
+                    var reportType = $(".current")[0].innerHTML;
+                    var durationReport = $(".current")[1].innerHTML;
+                    var durationRep = "";
+
+                    if (durationReport == "Last 60 Days") {
+                        durationRep = "L60";
+                    }
+                    if (durationReport == "Last 30 Days") {
+                        durationRep = "L30";
+                    }
+                    if (durationReport == "Last 12 months") {
+                        durationRep = "L12";
+                    }
+                    if (durationReport == "Yesterday") {
+                        durationRep = "yest";
+                    }
+                    if (durationReport == "Select Date Range") {
+                        durationRep = "sdr";
+                    }
+                    if (durationReport == "Last 90 Days") {
+                        durationRep = "L90";
+                    }
+                    if (durationReport == "Last 7 Days") {
+                        durationRep = "L7";
+                    }
+
+                    var startDateRep = $('#SelectStartDate input').val();
+                    var endDateRep = $('#SelectEndDate input').val();
+
+
+                    if (reportType == "5-Day Violation Tracking System" || reportType == "Valet Trash Violations") {
+                        window.location.href = "{!URLFOR($Page.WK_ViolationDetail)}?accntId=" + accountid + "&name=" + vioname + "&pageNo=" + pageNumber + "&typeOfVio=" + reportType + "&dura=" + durationRep + "&startDateRep=" + startDateRep + "&endDateRep=" + endDateRep;
+                    }
+                    if (reportType == "Closed Inquiries" || reportType == "Open Inquiries") {
+                        window.location.href = "{!URLFOR($Page.WK_inquiryDetails)}?accntId=" + accountid + "&name=" + vioname + "&pageNo=" + pageNumber + "&dura=" + durationRep + "&startDateRep=" + startDateRep + "&endDateRep=" + endDateRep;
+                    }
+
+
+                }
+
+
+
+                $('.dropdown-toggle').dropdown();
+                $('#table').bootstrapTable({
+                    mobileResponsive: true,
+                    search: true,
+                    pagination: true,
+                    checkboxHeader: false,
+                    smartDisplay: false,
+                    pageSize: 10, //specify 5 here
+                    pageList: [10, 50, 'All'], //list can be specified here
+                    uniqueId: 'violation',
+                    classes: 'results table',
+                });
+
+                $('.bootstrap-table').find(".pull-right.search input[type=text]").each(function(ev) {
+                    if (!$(this).val()) {
+                        $(this).attr("placeholder", "Search");
+                        var div = '<div class="col-md-1"><span class="search-icon-span"><img src="/wellkept/resource/1507028996000/wkresources/icons/search.svg?orgId=00Dn000000096Gu"></span></div>';
+                        $(this).parent().prepend(div);
+                    }
+                });
+
+
+
+                window.onload = function() {
+
+                    //fetchFields('{!duration}');
+                    //fetchPicklist('{!selectedType}');
+
+                }
+                /* function fetchFields(val){
+                      if(val == 'Select Date Range') {
+                          document.getElementById('select-date-fields').style.display= 'block';
+                          $(".datepicker-start").attr('required',true);
+                         $(".datepicker-end").attr('required',true);
+                      }
+                      else {
+                          document.getElementById('select-date-fields').style.display= 'none';
+                          $(".datepicker-start").removeAttr('required',true);
+                         $(".datepicker-end").removeAttr('required',true);
+                      }
+                     }*/
+                function fetchFields(val) {
+                    //  if(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+                    /*    if(val == 'Select Date Range') {
+                            document.getElementById('select-date-fields').style.display= 'block';
+                            $(".datepicker-start").attr('required',true);
+                            $(".datepicker-end").attr('required',true);
+                          
+                            if($('[id$="report-type"]').val() == "Upcoming Services"){
+                                $('.datepicker-start').datepicker({minDate: new Date(), maxDate: 0}).val('');
+                                $('.datepicker-end').datepicker({maxDate: 0}).val('');
+                            }else{
+                                $('.datepicker-start').datepicker({minDate: 0, maxDate: new Date()}).val('');
+                                $('.datepicker-end').datepicker({maxDate: new Date()}).val('');
+                            }
+                        }
+                        else {
+                           document.getElementById('select-date-fields').style.display= 'none';
+                           $(".datepicker-start").removeAttr('required',true);
+                          $(".datepicker-end").removeAttr('required',true);
+                        }*/
+                    //   }
+                    //   else {
+                    if (val == 'Select Date Range') {
+                        $("#reportMob").removeClass('bottomMrg'); /*9805 priyanka*/
+                        $("#reportMob").css('margin-bottom', '30px'); /*9805 priyanka*/
+                        $(".viewMobile").addClass('margMob'); /*9805 priyanka*/
+                        $(".text-right").addClass("rangeMobile");
+                        document.getElementById('select-date-fields-desk').style.display = 'block';
+                        $(".datepicker-start").attr('required', true);
+                        $(".datepicker-end").attr('required', true);
+
+                        if ($('[id$="report-type"]').val() == "Upcoming Services") {
+                            $('.datepicker-start').datepicker({
+                                minDate: new Date(),
+                                maxDate: 0
+                            }).val('');
+                            $('.datepicker-end').datepicker({
+                                maxDate: 0
+                            }).val('');
+                        } else {
+                            $('.datepicker-start').datepicker({
+                                minDate: 0,
+                                maxDate: new Date()
+                            }).val('');
+                            $('.datepicker-end').datepicker({
+                                maxDate: new Date()
+                            }).val('');
+                        }
+                    } else {
+                        $("#reportMob").addClass('bottomMrg'); /*9805 priyanka*/
+                        $(".rangeMobile").addClass('paddMobile'); /*9805 priyanka*/
+                        document.getElementById('select-date-fields-desk').style.display = 'none';
+                        $(".datepicker-start").removeAttr('required', true);
+                        $(".datepicker-end").removeAttr('required', true);
+                    }
+                    //    }
+
+                }
+
+                function fetchPicklist(val) {
+                    var durati = $('.form-control select-duration').val();
+
+                    if (val != 'Upcoming Services') {
+
+                        //document.getElementById('otherServices').style.display= 'block';
+                        $('.otherServices').show();
+                        $('.upcomingServices').hide();
+                        // document.getElementById('upcomingServices').style.display= 'none';
+                        fetchFields(dur);
+                    } else {
+                        $('.otherServices').hide();
+                        $('.upcomingServices').show();
+                        var dur = $('.upComeValue').val();
+                        if (dur == 'Select Date Range') {
+                            fetchFields(dur);
+                        }
+                        //   document.getElementById('otherServices').style.display= 'none';
+                        // document.getElementById('upcomingServices').style.display= 'block';
+                    }
+                }
+
+                /*
+                function exportDetails(){
+                        window.open('{!URLFOR($Page.WK_ExportToExcel)}?param1={!selectedType}&param2={!duration}&param3={!startDate}&param4={!endDate}');
+                    }
+                */
+                function exportDetails() {
+                    var searchValue = $('.bootstrap-table .form-control').val();
+                    window.open('{!URLFOR($Page.WK_exportToCSV)}?param1={!selectedType}&param2={!duration}&param3={!startDate}&param4={!endDate}&Id={!accountId}&searchText=' + searchValue);
+                }
+
+                function exportDetailsToPDF() {
+                    window.open('{!URLFOR($Page.WK_ExportToPDF)}?param1={!selectedType}&param2={!duration}&param3={!startDate}&param4={!endDate}');
+                }
+
+                function printingTheRecs() {
+                    var searchValue = $('.bootstrap-table .form-control').val();
+                    window.open('{!URLFOR($Page.WK_PrintingVioRecs)}?param1={!selectedType}&param2={!duration}&param3={!startDate}&param4={!endDate}&Id={!accountId}&searchText=' + searchValue);
+                    // window.open('apex/WK_PrintingVioRecs?param1={!selectedType}&param2={!duration}&param3={!startDate}&param4={!endDate}&Id={!accountId}');
+                }
+
+                function navigationToVioRecJS(val) {
+                    if (val != null && val != '') {
+                        window.open('{!URLFOR($Page.WK_ViolationDetail)}?accntId={!accountId}&name=' + val);
+
+                    }
+                }
+
+                function navigationToReport() {
+                    navigationToReportOptionPage();
+                }
+
+                function navigatetoinquiry(inquiryid) {
+                    window.open('{!URLFOR($Page.WK_inquiryDetails)}?accntId={!accountId}&name=' + inquiryid);
+                }
+
+                function printJS() {
+                    window.print();
+                }
+            </script>
+        </apex:outputPanel>
+        <script>
+            $('.dropdown-toggle').dropdown();
+            $('#table').bootstrapTable({
+                mobileResponsive: true,
+                search: true,
+                pagination: true,
+                checkboxHeader: false,
+                smartDisplay: false,
+                pageSize: 10, //specify 5 here
+                pageList: [10, 50, 'All'], //list can be specified here
+                uniqueId: 'violation',
+                classes: 'results table',
+            });
+
+            $('.bootstrap-table').find(".pull-right.search input[type=text]").each(function(ev) {
+                if (!$(this).val()) {
+                    $(this).attr("placeholder", "Search");
+
+
+
+                }
+            });
+
+            function hideOptionsMobile() {
+                var $window = $(window),
+                    $html = $('html');
+
+                function resize() {
+                    if ($window.width() > 991) {
+                        closeReportFilter();
+                    }
+                }
+
+                $window
+                    .resize(resize)
+                    .trigger('resize');
+            }
+
+            function toggleProfileMenu(event) {
+                event.stopPropagation();
+                $('.profile-dialog').toggleClass('toggled');
+                $('.down-arrow').toggleClass('down-arrow-rotate');
+                $('.profile-window').toggleClass('visible');
+            }
+
+            // Mobile Menu Toggles
+            function mobileToggle() {
+                $('body').toggleClass('mobile-menu-open');
+                $('.bars').toggleClass('clicked');
+                $('.mobile-menu').toggleClass('open menu-opened');
+                $('.mobile-toggle').toggleClass('menu-opened');
+
+            }
+
+
+            function reportFilters() {
+                $('.toolbar-wrap').toggleClass('open');
+                $('.search-wrap').toggleClass('open');
+                $('.report-options').toggleClass('hidden-xs hidden-sm');
+                $('.close-report-options').removeClass('hidden');
+                $('.search-mobile').removeClass('hidden');
+
+            }
+
+            function closeReportFilter() {
+                $('.close-report-options').addClass('hidden');
+                $('.toolbar-wrap').removeClass('open');
+                $('.search-wrap').removeClass('open');
+                $('.report-options').removeClass('hidden-xs hidden-sm');
+                $('.search-mobile').addClass('hidden');
+            }
+
+            function convertExistingDates() {
+                var startDate = $('.datepicker-start').val();
+                var endDate = $('.datepicker-end').val();
+
+                if (startDate && endDate) {
+                    var newStartDate = moment.utc(new Date(startDate)).format('MM/DD/YYYY');
+                    var newEndDate = moment.utc(new Date(endDate)).format('MM/DD/YYYY');
+                    $('.datepicker-start').val(newStartDate);
+                    $('.datepicker-end').val(newEndDate);
+                }
+            }
+
+            var $start = $('.datepicker-start'),
+                $end = $('.datepicker-end');
+
+            $start.datepicker({
+                onSelect: function(fd, date) {
+                    $('.datepicker-start').parsley().validate();
+                    $end.data('datepicker')
+                        .update('minDate', date);
+
+                    $end.focus();
+                }
+            })
+
+            $end.datepicker({
+                onSelect: function(fd, date) {
+                    $('.datepicker-end').parsley().validate();
+                    $start.data('datepicker')
+                        .update('maxDate', date);
+
+                }
+            })
+
+            function datePickerConfig() {
+
+                $('.datepicker-start').datepicker({
+                    dateFormat: 'mm/dd/yyyy',
+                    language: 'en',
+                    maxDate: new Date(),
+                    timepicker: false
+                });
+
+                $('.datepicker-end').datepicker({
+                    dateFormat: 'mm/dd/yyyy',
+                    language: 'en',
+                    maxDate: new Date(),
+                    autoClose: true,
+                    timepicker: false
+
+                });
+            }
+
+            $('.datepicker-end').blur(function() {
+                var startDateNow = $('.datepicker-start').val();
+                var endDateNow = $('.datepicker-end').val();
+                sessionStorage.setItem("startDateNow", startDateNow);
+                sessionStorage.setItem("endDateNow", endDateNow);
+
+
+            });
+
+            $(document).ready(function() {
+                // To disable Right Click 
+                /*$("td").on("contextmenu",function(e){
+                      return false;
+                });*/
+
+
+                var $table = $('#table');
+                var pageNumber = '{!pgNumber}';
+
+                $table.bootstrapTable('selectPage', pageNumber);
+
+
+                if (pageNumber != "") {
+                    $table.bootstrapTable('prevPage');
+                    $table.bootstrapTable('nextPage');
+                    var activePage = 1 + parseInt(pageNumber);
+                    $('.pagination li.page-number:nth-child(' + activePage + ')').addClass('active');
+
+                }
+
+
+                $('.datepicker-start').val(sessionStorage.startDateNow);
+                $('.datepicker-end').val(sessionStorage.endDateNow);
+
+                $('.profile-btn').click(toggleProfileMenu);
+                $('.mobile-toggle').click(mobileToggle);
+
+                // Toggle Mobile Reports
+                $('.report-options').click(reportFilters);
+                $('.close-report-options').click(closeReportFilter);
+
+                // Listen for browser width
+                hideOptionsMobile();
+
+                // Initialize Nice Select
+                $('select').niceSelect();
+
+                $('form').parsley();
+
+
+                $('.profile-window').click(function() {
+                    if ($('.profile-dialog').hasClass('toggled')) {
+                        $('.profile-dialog').removeClass('toggled');
+                        $('.down-arrow').removeClass('down-arrow-rotate');
+                        $('.profile-window').removeClass('visible');
+                    }
+                });
+
+                $('.option').on("touchstart", function(e) {
+                    this.click();
+                });
+
+            });
+
+
+            $(document).click(function() {
+                $('.dropdown').removeClass('open');
+            });
+
+
+            $(window).on('load', function() {
+                $('.navigationLinks li ').eq(2).addClass('active');
+                datePickerConfig();
+                convertExistingDates();
+
+                /*Defect fix for 8012*/
+                var durationReport = '{!duration}';
+                if (durationReport == "Select Date Range") {
+                    $('#select-date-fields-desk').css("display", "block");
+                    $('#SelectStartDate input').val('{!startDateVal}');
+                    $('#SelectEndDate input').val('{!endDateVal}');
+                } else {
+                    $('#select-date-fields-desk').css("display", "none");
+                }
+
+            });
+        </script>
+    </body>
+</apex:page>

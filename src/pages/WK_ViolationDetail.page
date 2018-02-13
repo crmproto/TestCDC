@@ -1,0 +1,292 @@
+<apex:page docType="html-5.0" showHeader="false" standardStylesheets="false" standardController="Violation__c" extensions="WK_ViolationEditController" sidebar="false">
+
+    <head>
+        <meta name="viewport" content="initial-scale=1.0" />
+        <meta name="description" content="Wellkept Dashboard" />
+        <title>Violation Details | Wellkept</title>
+        <meta name="format-detection" content="telephone=no" />
+        <link href="https://fonts.googleapis.com/css?family=Montserrat:300,400,600,700" rel="stylesheet" />
+        <link href="https://fonts.googleapis.com/css?family=Merriweather:300,400,700,900" rel="stylesheet" />
+        <apex:stylesheet value="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" />
+        <apex:stylesheet value="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.11.1/bootstrap-table.min.css" />
+        <apex:stylesheet value="{!URLFOR($Resource.wkresources, 'js/c3/c3.min.css')}" />
+        <apex:stylesheet value="{!URLFOR($Resource.wkresources, 'js/swiper/dist/css/swiper.min.css')}" />
+        <apex:stylesheet value="{!URLFOR($Resource.wkresources, 'css/main.css')}" />
+
+        <apex:includeScript value="{!URLFOR($Resource.wkresources, 'js/jquery.min.js')}" />
+        <apex:includeScript value="{!URLFOR($Resource.wkresources, 'js/bootstrap/dist/js/bootstrap.min.js')}" />
+        <apex:includeScript value="{!URLFOR($Resource.wkresources, 'js/jquery.nice-select.min.js')}" />
+        <apex:includeScript value="{!URLFOR($Resource.wkresources, 'js/swiper/dist/js/swiper.min.js')}" />
+        <apex:includeScript value="{!URLFOR($Resource.wkresources, 'js/d3/d3.min.js')}" />
+        <apex:includeScript value="{!URLFOR($Resource.wkresources, 'js/c3/c3.min.js')}" />
+        <apex:includeScript value="{!URLFOR($Resource.wkresources, 'js/jquery.cookie/jquery.cookie.js')}" />
+        <apex:includeScript value="{!URLFOR($Resource.wkresources, 'js/parsleyjs/dist/parsley.min.js')}" />
+        <apex:includeScript value="{!URLFOR($Resource.wkresources, 'js/main.js')}" />
+
+        <style>
+            .noImage {
+                height: 250px;
+                width: 100%;
+                border: 1px solid #979797;
+                padding: 100px;
+                margin-bottom: 10px;
+            }
+
+            .iconRotate {
+                transform: rotate(180deg);
+            }
+
+            .vioDetails .value {
+                height: 50px;
+                width: 100%;
+                padding-bottom: 0;
+            }
+        </style>
+
+
+    </head>
+
+    <body>
+        <!-- DE9760 -->
+        <c:WK_HeaderComponent title="{!$Label.WK_ViolationDetailLabel}"></c:WK_HeaderComponent>
+
+
+        <!--Violation Details Start-->
+        <div class="container">
+            <div class="col-md-8 col-md-offset-2">
+                <apex:form id="formId">
+                    <apex:actionFunction action="{!navigateToEditPage}" name="navigationToVioRecAF" reRender="formId">
+                        <apex:param name="name" assignTo="{!name}" value="" />
+                        <!--<apex:param name="accountId" assignTo="{!accountId}" value="" /> -->
+                    </apex:actionFunction>
+                    <div class="page-header">
+                        <h1 class="">Violation Details</h1>
+                        <apex:commandLink onclick="navigationToVioRecJS('{!violationName}');return false" styleClass="addContactText">
+                            <img type="image/svg+xml" class="edit-icon pr-5 iconHeight " src="{!URLFOR($Resource.wkresources, 'icons/edit.svg')}" /><strong>EDIT</strong>
+                        </apex:commandLink>
+
+
+                    </div>
+                    <div class="row mt-25">
+
+                        <div class="col-sm-6">
+                            <a href="{!URLFOR($Page.WK_Reports)}?Id={!accountId}&pgName={!pgNumber}&typeOfVio={!vioType}&dura={!duration}&startDateRep={!startDateRep}&endDateRep={!endDateRep}">
+                <img type="image/svg+xml" class="edit-icon pr-5 iconHeight " src="{!URLFOR($Resource.wkresources, 'icons/group.png')}"/><strong style="font-weight:600; font-size: 12px; color: #00adef; font-family: Montserrat;">GO BACK</strong>            
+            </a>
+                            <div class="row mt-25 hidden-xs">
+
+                                <div class="col-sm-6 vioDetails">
+
+                                    <div class="label">
+                                        Date Reported
+                                    </div>
+                                    <div class="value date">
+                                        {!datechecked}
+                                    </div>
+
+                                    <div class="label">
+                                        Building
+                                    </div>
+                                    <div class="value building">
+                                        {!buildingName}
+                                    </div>
+                                    <div class="label">
+                                        Type
+                                    </div>
+                                    <div class="value bags">
+                                        {!violationType}
+                                    </div>
+                                    <div class="label">
+                                        Fine Amount
+                                    </div>
+                                    <div class="value fine-amount">
+                                        {!violationFineAmount}
+                                    </div>
+                                    <div class="label">
+                                        Note
+                                    </div>
+                                    <div class="value note">
+                                        {!violationAddNote}
+                                    </div>
+                                </div>
+                                <div class="col-sm-6 vioDetails">
+                                    <div class="label">
+                                        violation #
+                                    </div>
+                                    <div class="value">
+                                        {!violationName}
+                                    </div>
+                                    <div class="label">
+                                        Unit #
+                                    </div>
+                                    <div class="value">
+                                        {!violationUnit}
+                                    </div>
+                                    <div class="label">
+                                        Quantity
+                                    </div>
+                                    <div class="value quantity">
+                                        {!violationQuantity}
+                                    </div>
+                                    <div class="label">
+                                        Status
+                                    </div>
+                                    <div class="value reviewed">
+                                        {!violationStatus}
+                                    </div>
+                                </div>
+                            </div>
+							            <!--priyanka (9811) Start-->
+            <div class="row  mt-25">
+                <div class="col-xs-12">
+                      <div class="label">
+                  Date Reported
+                </div>
+                  <div class="value date">
+                  {!datechecked}
+                </div>
+
+                 <div class="label">
+                  violation #
+                </div>
+                <div class="value">
+                  {!violationName}
+                </div>
+                 <div class="label">
+                  Building
+                </div>
+                <div class="value building">
+                 {!buildingName}
+                </div>
+                 <div class="label">
+                  Unit #
+                </div>
+                <div class="value">
+                  {!violationUnit}
+                </div>
+                 <div class="label">
+                 Violation Type
+                </div>
+                <div class="value bags">
+                  {!violationType}
+                </div>
+                 <div class="label">
+                  Quantity
+                </div>
+                <div class="value quantity">
+                  {!violationQuantity}
+                </div>
+                 <div class="label">
+                  Fine Amount
+                </div>
+                <div class="value fine-amount">
+                    {!violationFineAmount}
+                </div>
+                    <div class="label">
+                  Status
+                </div>
+                <div class="value reviewed">
+                  {!violationStatus}
+                </div>
+                 <div class="label">
+                  Note
+                </div>
+                <div class="value note">
+                  {!violationAddNote}
+                </div>
+                </div>
+            </div>
+             <!--priyanka (9811) Ends-->
+                        </div>
+                        <div class="col-sm-6 images mt-40">
+                            <div class="label">
+                                Images
+                            </div>
+                            <div class="violationImg1">
+                                <apex:outputPanel rendered="{!IF(attachedFiles != null && attachedFiles.size > 0, true, false)}">
+                                    <apex:image width="250px" height="250px" url="/servlet/servlet.FileDownload?file={!firstFileAttId}" />
+                                </apex:outputPanel>
+                                <apex:outputPanel rendered="{!IF(AND(listOfContentDocLinks !=null,listOfContentDocLinks.size > 0,OR(attachedFiles == null,attachedFiles.size == 0)), true, false)}">
+                                    <!-- <apex:image width="100%" height="100%" url="https://cs90.salesforce.com/wellkept/sfc/servlet.shepherd/version/download/{!firstFileAttId}"/> -->
+                                    <apex:image width="100%" height="100%" url="{!imageUrl1}" />
+                                </apex:outputPanel>
+                            </div>
+                            <div class="noImage firstImg">No Image Available</div>
+                            <div class="violationImg2">
+                                <apex:outputPanel rendered="{!IF(attachedFiles != null && attachedFiles.size > 1, true, false)}">
+                                    <apex:image width="250px" height="250px" url="/servlet/servlet.FileDownload?file={!firstFil2AttId}" />
+                                </apex:outputPanel>
+                                <apex:outputPanel rendered="{!IF(AND(listOfContentDocLinks !=null,listOfContentDocLinks.size > 1,OR(attachedFiles == null,attachedFiles.size == 0)), true, false)}">
+                                    <!-- <apex:image width="100%" height="100%" url="https://cs90.salesforce.com/wellkept/sfc/servlet.shepherd/version/download/{!firstFil2AttId}"/> -->
+                                    <apex:image width="100%" height="100%" url="{!imageUrl2}" />
+                                </apex:outputPanel>
+                            </div>
+                            <div class="noImage secondImg">No Image Available</div>
+                            <!--<img url="/servlet/servlet.FileDownload?file={!firstFileId}"/> -->
+                            <!--<img src="https://dummyimage.com/362x223/000/ffffff.png&text=Placeholder+Image"/>-->
+                        </div>
+                    </div>
+
+                    <div class="text-center mt-55 mb-20 hidden-xs hidden-sm">
+                        <div id="editor"></div>
+                        <button class="secondary button-small" href="#" rel="popover" data-popover-content="#download-dropdown-options" data-placement="top"> <img type="image/svg+xml" class="pl-5 iconRotate " src="{!URLFOR($Resource.wkservicesImg, 'mobileImg/ic-upload.png')}"/> 
+                  Download Violation </button>
+                        <div id="download-dropdown-options" class="hide">
+                            <ul>
+                                <li>
+                                    <apex:commandLink value="PDF" onclick="exportToPDF();return false;" />
+                                </li>
+                            </ul>
+                        </div>
+
+                    </div>
+                    <!--  <div class="text-center mt-30 mb-20 visible-xs visible-sm">
+             <apex:commandLink onclick="navigationToVioRecJS('{!violationName}');return false" styleClass="secondary button-small">
+                    Edit
+                </apex:commandLink>
+            </div> -->
+                </apex:form>
+
+            </div>
+        </div>
+        <c:WK_FooterComponent ></c:WK_FooterComponent>
+        <div class="profile-window"></div>
+        <!--Violation Details End-->
+        <script>
+            function navigationToVioRecJS(val) {
+                if (val != null && val != '') {
+                    navigationToVioRecAF(val);
+                }
+            }
+
+
+            function exportToPDF() {
+                var rec = '{!violationName}';
+                if (rec != null && rec != '') {
+                    window.open('/wellkept/WK_ExportToPDFViolation' + '?name=' + rec);
+                }
+            }
+            $(document).ready(function() {
+                $('.navigationLinks li ').eq(2).addClass('active');
+                var img1 = '{!firstFileAttId}',
+                    img2 = '{!firstFil2AttId}';
+
+                $('.firstImg').hide();
+                $('.secondImg').hide();
+
+                if (img1 == '') {
+                    $('.violationImg1').hide();
+                    $('.firstImg').show();
+                }
+
+                if (img2 == '') {
+                    $('.violationImg2').hide();
+                    $('.secondImg').show();
+                }
+
+            });
+        </script>
+    </body>
+
+
+</apex:page>

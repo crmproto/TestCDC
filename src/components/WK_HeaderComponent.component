@@ -1,0 +1,1179 @@
+<apex:component controller="WK_HeaderComponentController" allowDML="true">
+    <!--header start-->
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
+    <script type="text/javascript">
+        $(document).ready(function() {
+
+            var accountNameVisible = '{!AccName}';
+
+            if (accountNameVisible == "") {
+                $('.accountNameVerticalBar').hide();
+            } else {
+                $('.accountNameVerticalBar').show();
+            }
+
+            var profileImg = '{!firstFileId}';
+
+            if (profileImg == '') {
+                $('.profileImg').hide();
+                $('.noProfileImg').show();
+            }
+
+
+            $('.navigationLinksRM').hide();
+            $('.settingsForRM').hide();
+
+            $(".noThanks").on("click", function() {
+                $('.waitPopUp').hide();
+
+            });
+
+            if ('{!$CurrentPage.Name}' == "WK_RM_Rollup_Home") {
+                $('.propertyBox .proText:first-child').css("color","rgb(36, 87, 107)");
+                $('.navigationLinksRM').show();
+                $('.navigationLinks').hide();
+                $('.settingsForRM').show();
+                $('.settings').hide();
+                $('.navigationLinksRM').on("click", function() {
+                    $('.waitPopUp').show();
+		    // Defect Fix Ashish 9830
+                    $('.mobile-menu').removeClass('.open');
+
+                });
+                $('.settingsForRM').on("click", function() {
+                    $('.waitPopUp').show();
+
+                });
+            }
+
+// Priyanka defect fixes 9760 
+           $( ".R1" ).click(function() {
+           /*  alert("IN side Reports");*/
+                      var text = $( this ).text();
+                      
+                  /*     alert(text);*/
+                         //$(".divtext" ).html( text );
+                         sessionStorage.setItem("header", text);
+                    });
+
+
+        });
+
+        /*alert({!$CurrentPage.Name});*/
+        //var a= '{!$CurrentPage.Name}';
+
+
+        document.onreadystatechange = function() {
+            if (document.readyState === 'complete') {
+                var initialAccID = '{!accountId}';
+                var accountSelected = sessionStorage.getItem("accountID");
+                if (accountSelected == null) {
+                    sessionStorage.setItem("accountID", initialAccID);
+                    accountSelected = sessionStorage.getItem("accountID");
+                }
+
+                $('[data-accountid = ' + accountSelected + ']').css("color", "#24576b");
+            }
+        }
+
+
+        function accountfunction(acId, e) {
+            $(e.target).addClass('activeAccount').siblings().removeClass('activeAccount');
+            var pageUrl = '{!URLFOR($Page.WK_homepage)}';
+            var pageUrlRM = '{!URLFOR($Page.WK_RM_Rollup_Home)}';
+            var link;
+            var parameters
+            if (acId == 'RM') {
+                sessionStorage.setItem("accountID", acId);
+                link = pageUrlRM;
+            } else {
+                parameters = '?Id=' + acId;
+                sessionStorage.setItem("accountID", acId);
+                link = pageUrl + parameters;
+            }
+            window.location = link;
+        }
+
+        var filecountFeed = 0;
+        var maxfilecountFeed = 1;
+        var maxtotaluploadsize = 2100000;
+        var maxFileSize = 4500000; // Ashish De9707
+        var maxImageSize = 4500000;
+        var files = [];
+
+        function FeedContentFileWrapper() {
+            var type;
+            var name;
+            var body;
+        }
+
+
+
+        function getOrientation(file, callback) {
+            var reader = new FileReader();
+            reader.onload = function(e) {
+
+                var view = new DataView(e.target.result);
+                if (view.getUint16(0, false) != 0xFFD8) return callback(-2);
+                var length = view.byteLength,
+                    offset = 2;
+                while (offset < length) {
+                    var marker = view.getUint16(offset, false);
+                    offset += 2;
+                    if (marker == 0xFFE1) {
+                        if (view.getUint32(offset += 2, false) != 0x45786966) return callback(-1);
+                        var little = view.getUint16(offset += 6, false) == 0x4949;
+                        offset += view.getUint32(offset + 4, little);
+                        var tags = view.getUint16(offset, little);
+                        offset += 2;
+                        for (var i = 0; i < tags; i++)
+                            if (view.getUint16(offset + (i * 12), little) == 0x0112)
+                                return callback(view.getUint16(offset + (i * 12) + 8, little));
+                    } else if ((marker & 0xFF00) != 0xFF00) break;
+                    else offset += view.getUint16(offset, false);
+                }
+                return callback(-1);
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        function resizeMe(img, orientation) {
+
+            var canvas = document.createElement('canvas');
+
+            // resize the canvas and draw the image data into it
+
+            if (orientation == "6") {
+                canvas.width = img.height;
+                canvas.height = img.width;
+                var ctx = canvas.getContext("2d");
+                ctx.translate(canvas.width / 2, canvas.height / 2);
+                ctx.rotate(Math.PI / 2);
+                ctx.drawImage(img, -img.width / 2, -img.height / 2);
+            } else {
+                canvas.width = img.width / 1;
+                canvas.height = img.height / 1;
+                var ctx = canvas.getContext("2d");
+                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+            }
+
+            return canvas.toDataURL("image/jpeg", 1); // get the data from canvas as 10% JPG (can be also PNG, etc.)
+
+        }
+
+        function previewfileFeedback(event) {
+            $('.fileLableFeed').css("display", "block");
+            if (filecountFeed < maxfilecountFeed) {
+                var file = document.querySelector('#inquiry-file-img-feedback').files[0]; //||document.querySelector('#inquiry-file-img-mob').files[0];
+                if (file) {
+                    var filetype = file.type.split('/')[0];
+                    if (file.size == 0) {
+                        $("#uploaderror").text("File size must be greater than 0 bytes. Cannot upload " + file.name + ". Please try again.");
+                    } else if (filetype == 'image' && file.size > maxImageSize) {
+		    // Defect Fix Ashish 9707
+                        $("#uploaderror").text("Image size must be less than 5MB. Cannot upload " + file.name + ". Please try again.");
+                    }
+                    /*else if(filetype != 'image' && file.size > maxFileSize) {
+                        $("#uploaderror").text("File size must be less than 1MB. Cannot upload "+file.name+". Please try again.");        
+                    }*/
+                    else {
+                        $("#uploaderror").text("");
+                        filecountFeed++;
+                        // $('#uploadedfile').append('<div class="inquiry-img col-md-4 pr-0 "><img class="inquiry-file-preview uploadImg attachment-img"  src=""/><img type="image/svg+xml" onclick="deletefilefromimage(this);return false;" class="edit-icon pr-5 iconHeight inquiry-img-delete " src="{!URLFOR($Resource.wkresources, 'icons/btn-delete.png')}"/></div>');
+                        // var preview = document.querySelectorAll('.inquiry-file-preview')[filecountFeed-1];
+                        var reader = new FileReader();
+                        reader.readAsDataURL(file);
+                        reader.onload = function(event) {
+                            var item = new FeedContentFileWrapper();
+                            item.name = file.name;
+                            item.type = filetype;
+                            files.push(item);
+                            if (filetype == 'image') {
+                                var imgreader = new FileReader();
+                                imgreader.readAsArrayBuffer(file);
+                                imgreader.onload = function(event) {
+                                    // blob stuff
+                                    var blob = new Blob([event.target.result]); // create blob...
+                                    window.URL = window.URL || window.webkitURL;
+                                    var blobURL = window.URL.createObjectURL(blob); // and get it's URL
+                                    var image = new Image();
+                                    image.src = blobURL;
+                                    image.onload = function() {
+                                        // have to wait till it's loaded
+                                        //optimizeOrientation(file, preview);
+                                        getOrientation(file, function(orientation) {
+                                            var resized = resizeMe(image, orientation); // send it to canvas
+                                            // preview.src = resized; // put result from canvas into new hidden input 
+                                            item.body = resized; // preview.src;
+                                        });
+                                    }
+                                }
+                            } else {
+                                 item.body = reader.result;
+                                 var type = file.name.split(".").pop();
+                                if(filetype == 'audio' || filetype == 'video') {
+                                  type = filetype;
+                                 }
+                                // customIconPreview(preview,type);
+                            }
+                            $('#uploadedfilenameFeed').append('<div class="inquiry-filenameFeed"><div class="label mt-10 ">SELECTED FILE</div><div class="fileLableFeed pb-10">' + file.name +
+                                '<img type="image/svg+xml" onclick="deletefilefromnameFeed(this);return false;" class="edit-icon pr-5 iconHeight inquiry-file-delete-feed" src="{!URLFOR($Resource.wkresources, 'icons/btn-delete.png')}"/></div></div>');
+                            if (filecountFeed == maxfilecountFeed) {
+                                $('#choosefileFeed').css({
+                                    "pointer-events": "none",
+                                    "cursor": "default"
+                                });
+                            }
+                        }
+                    }
+                }
+
+            }
+
+        }
+
+        function deletefileFeed(fileindex) {
+            $('#uploadedfile > .inquiry-img:nth-child(' + (fileindex + 1) + ')').remove();
+            $('#uploadedfilenameFeed > .inquiry-filenameFeed:nth-child(' + (fileindex + 1) + ')').remove();
+            files.splice(fileindex, 1);
+            filecountFeed--;
+            if (filecountFeed < maxfilecountFeed && filecountFeed >= 0) {
+                $('#choosefileFeed').css({
+                    "pointer-events": "auto",
+                    "cursor": "pointer"
+                });
+            } else if (filecountFeed == 0) {
+                $('.fileLableFeed').css("display", "none");
+            }
+            $("#inquiry-file-img-feedback").val("");
+        }
+
+        function deletefilefromnameFeed(thisbutton) {
+            var fileindex = $('.inquiry-file-delete-feed').index(thisbutton);
+            deletefileFeed(fileindex);
+        }
+
+        function openModalJSFeed() {
+            $('.sendFeedback').addClass("disableSend");
+            var limit;
+            var feeditemerror = false;
+            var totalsize = 0;
+            var headInquiry = 'data:image/png;base64,';
+            if (files.length <= maxfilecountFeed) {
+                limit = files.length;
+            } else {
+                limit = maxfilecountFeed;
+            }
+            for (var i = 0 ; i <limit ; i++) {
+              var item = files[i];
+              var imgFileSizeInquiry = Math.round((item.body.length - headInquiry.length)*3/4) ;
+              if(imgFileSizeInquiry > 0) {
+                totalsize += imgFileSizeInquiry;
+              }    
+              else {
+                  $("#uploaderror").text("File size error. Cannot upload "+item.name+". Please try again. ");
+                  deletefileFeed(i);
+                  feeditemerror = true;
+              }    
+            }
+
+            /*Defect Fix 9707 - Ashish*/
+            if (totalsize > maxFileSize) {
+                feeditemerror = true;
+                $("#uploaderror").text("File size must be less than 5MB. Cannot upload " + item.name + ". Please try again.");
+                for (var i = 0; i < limit; i++) {
+                    deletefileFeed(i);
+                }
+                files = [];
+                filecountFeed = 0;
+            }
+            if (!feeditemerror) {
+                $("#uploaderror").text("");
+                // $('.sendcase').addClass('disableSend'); 
+                var feedsjson = JSON.stringify(files);
+                var ratingValue = parseInt($('#stars li.selected').last().data('value'), 10);
+                var portalLike = $('.portalLike').val();
+                var portalimprove = $('.improvePortal').val();
+                // alert(feedsjson+ratingValue+portalimprove+portalLike);  
+                createCaseActionHD(feedsjson, ratingValue, portalLike, portalimprove);
+
+
+                files = [];
+                filecountFeed = 0;
+            }
+        }
+
+        /* function callHomePage()
+         {
+             var accountId = document.getElementById("estimateCost").innerHTML;
+             var pageUrl = '{!URLFOR($Page.WK_homepage)}';
+             var parameters = '?Id=' + accountId;
+             var link = pageUrl + parameters;
+             window.location=link;
+          } */
+
+
+        function clearAllJunk() {
+            $('.rating-stars ul li').removeClass('selected');
+            $('.improvePortal').val('');
+            $('.portalLike').val('');
+            deletefileFeed(0);
+            $("#uploaderror").text("");
+            $('.sendFeedback').addClass("disableSend");
+            filecountFeed = 0;
+        }
+
+
+        function starLogic() {
+            /* 1. Visualizing things on Hover - See next part for action on click */
+            $('#stars li').on('mouseover', function() {
+                var onStar = parseInt($(this).data('value'), 10); // The star currently mouse on
+
+                // Now highlight all the stars that's not after the current hovered star
+                $(this).parent().children('li.star').each(function(e) {
+                    if (e < onStar) {
+                        $(this).addClass('hover');
+                    } else {
+                        $(this).removeClass('hover');
+                    }
+                });
+
+            }).on('mouseout', function() {
+                $(this).parent().children('li.star').each(function(e) {
+                    $(this).removeClass('hover');
+                });
+            });
+
+
+            /* 2. Action to perform on click */
+            $('#stars li').on('click', function() {
+                var onStar = parseInt($(this).data('value'), 10); // The star currently selected
+                var stars = $(this).parent().children('li.star');
+
+                for (i = 0; i < stars.length; i++) {
+                    $(stars[i]).removeClass('selected');
+                }
+
+                for (i = 0; i < onStar; i++) {
+                    $(stars[i]).addClass('selected');
+                }
+
+                // JUST RESPONSE (To give to the backend )
+                var ratingValue = parseInt($('#stars li.selected').last().data('value'), 10);
+
+                if (ratingValue > 0) {
+                    $('.sendFeedback').removeClass("disableSend");
+                } else {
+                    $('.sendFeedback').addClass("disableSend");
+                }
+
+
+            });
+
+
+        }
+
+        function initializeJquery() {
+
+            $('.portalfeedSend').hide();
+            $('.thanksFeed').show();
+
+            starLogic();
+        }
+
+
+
+        $(document).ready(function() {
+
+            starLogic();
+
+            $('.cancelFeedBack').on('click', function() {
+
+                clearAllJunk();
+
+            });
+
+            $('.feedback').on('click', function() {
+                clearAllJunk();
+                $('.portalfeedSend').show();
+                $('.thanksFeed').hide();
+            });
+
+            $('[data-dismiss=modal]').on('click', function(e) {
+                $('#portalfeedback').trigger("reset");
+            });
+
+            $('.modal-backdrop').click(function() {
+                $('[data-dismiss=modal]').trigger('click');
+            });
+
+        });
+    </script>
+
+
+
+    <style>
+      /*--9760 (Priyanka)Start-*/ 
+    .divtext{
+        display:none;
+    }
+       /*--9760 (Priyanka)end-*/ 
+
+
+        textarea {
+            resize: none;
+        }   
+
+        .navigationLinksRM {
+            display: none;
+        }        
+
+        .myServices::-webkit-scrollbar,
+        .scrollAccount::-webkit-scrollbar,
+        .property::-webkit-scrollbar {
+            display: none;
+        }
+
+        .propertyBox {
+            overflow: hidden;
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .propertyBox .proText:first-child {
+            margin-top: 20px;
+        }
+
+        .noThanks {
+            cursor: pointer;
+        }
+
+
+        .scrollAccount div {
+            cursor: pointer;
+            color: white;
+        }
+
+        .scrollAccount {
+            max-height: 238px;
+            overflow-y: scroll;
+        }
+
+        .waitPopUp {
+            display: none;
+            z-index: 10;
+            top: 60%;
+            left: 40%;
+            position: absolute;
+            background-color: #00adef;
+            width: 340px;
+            height: 520px;
+            padding-top: 50px;
+
+        }
+
+        .waitPopUp h3 {
+            font-size: 24px;
+            text-align: center;
+            color: #ffffff;
+        }
+
+        .waitPopUp h4 {
+            font-size: 16px;
+            text-align: center;
+            color: #ffffff;
+            font-weight: 600;
+            letter-spacing: 1.2px;
+            margin: 15px;
+            padding: 15px;
+            border: 1px solid;
+            font-family: Montserrat;
+
+        }
+
+        .waitPopUp p,
+        .waitPopUp div {
+            font-size: 16px;
+            text-align: center;
+            color: #ffffff;
+            padding: 10px;
+        }
+
+        .logout a {
+            font-size: 16px;
+        }
+
+        .settingsForRM {
+            position: absolute;
+            right: 15px;
+            top: 25px;
+        }
+
+
+
+        header .header-main {
+            line-height: 10px;
+        }
+
+        header span.logout {
+            padding: 15px 0;
+        }
+
+        header .profile-dialog {
+            right: 48px;
+            top: 6px;
+        }
+
+        .property {
+            padding: 0 20px;
+            max-height: 140px;
+            overflow-y: scroll;
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+
+        }
+
+        .property div {
+            color: white;
+            line-height: 1.5;
+            width: 90%;
+            cursor: pointer;
+
+        }
+
+        .activeAccount {
+            color: #24576b !important;
+        }
+
+        header .dialog-liner {
+            margin: 15px 45px 0px 15px;
+        }
+
+        .noProfileImg {
+            display: none;
+        }
+
+        /*Feedback CSS starts here */
+
+        .headerFeedback {
+            float: right;
+            margin-right: 20px;
+        }
+
+        .feedback div {
+            cursor: pointer;
+            width: 81px;
+            height: 18px;
+            font-family: Montserrat;
+            text-transform: uppercase;
+            padding: 15px 10px;
+            font-size: 14px;
+            font-weight: 400;
+            letter-spacing: 1.1px;
+            text-align: center;
+            color: #ffffff;
+
+        }
+
+        .CHOOSE-FILE {
+            cursor: pointer;
+            height: 15px;
+            font-family: Montserrat;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 0.9px;
+            float: right;
+            color: #00adef !important;
+            color: var(--azure);
+        }
+
+        .portalfeedback {
+            margin: 0 !important;
+        }
+
+        span.settingsForRM {
+            position: absolute;
+            right: 15px;
+            top: 25px;
+        }
+
+        .screenshotFeedback {
+            float: right;
+            display: inline-block;
+            margin-right: 38px;
+        }
+
+        /* Rating Star Widgets Style */
+
+        .rating-stars ul {
+            display: inline-block;
+            list-style-type: none;
+            padding: 0;
+            -moz-user-select: none;
+            -webkit-user-select: none;
+        }
+
+        .rating-stars ul>li.star {
+            display: inline-block;
+
+        }
+
+        /* Idle State of the stars */
+
+        .rating-stars ul>li.star>i.fa {
+            font-size: 1.5em;
+            /* Change the size of the stars */
+            color: #ccc;
+            /* Color on idle state */
+        }
+
+        /* Hover state of the stars */
+
+        .rating-stars ul>li.star.hover>i.fa {
+            color: #00adef;
+        }
+
+        /* Selected state of the stars */
+
+        .rating-stars ul>li.star.selected>i.fa {
+            color: #00adef;
+        }
+
+        .portalfeed span {
+            color: #989898;
+            text-transform: uppercase;
+        }
+
+        .likePortal {
+            width: 456px;
+            height: 122px;
+            background-color: #ffffff;
+            border: solid 1px #989898;
+        }
+
+        .thanksFeed p {
+            padding: 15px 60px;
+        }
+
+        .portalfeed {
+            margin-top: 15px;
+        }
+
+        .disableSend {
+            pointer-events: none;
+            opacity: 0.2;
+        }
+
+        .sendFeedback {
+            text-align: center;
+        }
+        /*Defect Fix 9707 - Ashish*/
+        .feedbackHeader{
+          font-family: Merriweather;
+          font-size: 24px;
+          font-weight: bold;
+          font-style: normal;
+          font-stretch: normal;
+          line-height: normal;
+          letter-spacing: normal;
+          text-align: left;
+          color: #003660;
+        }
+
+        /*Feedback CSS ends here */
+
+        .user-email{
+          word-break: break-all;
+          line-height: 12px;
+
+        }
+
+        header .mobile-menu .user-details .user-details-liner {
+            padding-bottom: 40px;
+        }
+
+        header .mobile-menu span.logout .logout-liner a {
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        header .mobile-menu.open {
+            height: auto;
+        }
+
+        .accountNames {
+             text-align: end;
+             padding-right: 23px;
+        }
+
+        /*Media Query for Mobile View*/
+        @media only screen and (max-width: 991px) {
+                   /*--9760 (Priyanka)Start--*/ 
+             .divtext{
+                display:inline-block;
+                font-size: 14px;
+                color: #fff;
+                top: 30px;
+                left: 46px;
+                position: relative;
+                font-weight: 600 !important;
+                text-align: center;
+                width:41%;
+                text-transform:uppercase;
+             }
+                        /*--9760 (Priyanka)end--*/ 
+
+
+            .waitPopUp {
+              top: 15%;
+              left: 10%;
+            }
+
+            .feedbackModalMob {
+                width: 100%;
+            }
+
+            .likePortal {
+                width: 89%;
+            }
+
+            .screenshotFeedback {
+                margin-right: 20px;
+            }
+
+            header .mobile-menu .user-details .user-details-liner {
+                padding-top: 10px !important;
+            }
+
+            header li {
+
+                line-height: 50px !important;
+            }
+
+            .property {
+                padding: 0 20px;
+                /* max-height: 140px; */
+                overflow-y: scroll;
+            }
+            header .mobile-menu .user-details {
+
+                margin-top: 0px;
+            }
+
+            .header-logo {
+
+                padding-top: 10px;
+            }
+        }
+
+        
+    </style>
+    <header>
+// Sucheta Defect 9760 
+<apex:attribute name="title" description="This is the value for the component." type="String" />
+        <!--  -->
+        <div class="mobile-menu">
+            <div class="mobile-menu-liner">
+            <!-- Fix for Defect 9830 -->
+                <ul class="navigationLinksRM">
+                    <li><a>Home</a></li>
+                    <li><a>Services</a></li>
+                    <li><a>Reports</a></li>
+                    <li><a>Documents</a></li>
+                    <li><a>Contact </a></li>
+                </ul>
+                <ul class="navigationLinks">
+                    <li><a href="{!URLFOR($Page.WK_homepage)}?Id={!accountId}">Home</a></li>
+                    <li><a href="{!URLFOR($Page.WK_Services)}?Id={!accountId}" >Services</a></li>
+                    <li><a href="{!URLFOR($Page.WK_reports)}?Id={!accountId}" class="R1" >Reports</a></li>
+                    <li><a href="{!URLFOR($Page.WK_Documents)}?Id={!accountId}">Documents</a></li>
+                    <li><a href="{!URLFOR($Page.WK_ContactUs)}?Id={!accountId}">Contact </a></li>
+                </ul>
+                <div class="user-details">
+                    <div class="user-details-liner">
+                        <span class="user-full-name">
+            {!conName}
+          </span>
+                        <span class="user-email pb-20">
+            {!conEmail}
+          </span>
+                        <!--<span class="user-emergency-contact">
+            <a href="#">Emergency Contact</a>
+          </span>-->
+
+                        <span class="settings">
+           <a href="{!URLFOR($Page.WK_Profile)}?Id={!accountId}">
+            <img src="{!URLFOR($Resource.wkresources, 'icons/icn-gear.svg')}" type="image/svg+xml" />
+           </a>
+         </span>
+                        <span class="settingsForRM">
+         <!-- <a href="{!URLFOR($Page.WK_Profile)}?Id={!accountId}">-->
+            <img src="{!URLFOR($Resource.wkresources, 'icons/icn-gear.svg')}" type="image/svg+xml" />
+         <!-- </a> -->
+         </span>
+                        <div data-toggle="modal" data-target=".bs-feedback-modal-lg" class="headerFeedback feedback">
+                            <div>Feedback</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="property">
+                    <apex:repeat id="accWrap3" value="{!listofJsonAccountWrapper}" var="accWrapper">
+                        <div class="mb-10" id="proText" data-accountid='{!accWrapper.accId}' onClick="accountfunction('{!accWrapper.accId}', event);return false">{!accWrapper.accountName}</div>
+                    </apex:repeat>
+                </div>
+
+
+                <span class="logout">
+           <span class="logout-liner">
+              <a href="{!$label.WK_LogoutURL}">Logout</a>
+            </span>
+                </span>
+            </div>
+        </div>
+
+        <div class="header-main" onload="myScript()">
+            <div class="container-fluid">
+                <div class="header-logo">
+                    <a href="{!URLFOR($Page.WK_homepage)}?Id={!accountId}">
+                <img id="logo" src="{!URLFOR($Resource.wkresources, 'img/logo.png')}" alt="wellkeptvf" border="0" name="logo" />
+            </a>
+                </div>
+               <!--9760 (Priyanka)Start--> 
+                <span class="divtext" style="">
+                      <apex:outputLabel style="font-size: 14px;color: #fff; font-weight:600;" value="{!title}"></apex:outputLabel> 
+                </span>
+                           <!--9760 (Priyanka)end--> 
+                <button class="mobile-toggle">
+          <div class="burger-container">
+                    <div id="burger">
+                      <div class="bar topBar"></div>
+                      <div class="bar btmBar"></div>
+                    </div>
+                  </div>
+        </button>
+                <nav>
+                    <div class="leftJustify"></div>
+                    <div class="accountNames">
+                        <span class="account-name">
+                            <apex:outputLabel style="font-size: 14px;color: #fff;" value="{!AccName}"></apex:outputLabel> 
+                             <label class ="accountNameVerticalBar" style="font-size: 14px;color: #fff;padding-left: 10px;">
+                             |</label> 
+                        </span>
+                        <span>
+
+                <button type="button" class="profile-btn" >
+                
+                <span class="sub-nav-avatar">
+                <!-- <img src="https://cdn1.iconfinder.com/data/icons/ninja-things-1/1772/ninja-simple-512.png" />
+                  <apex:image value="{!Photolink}"/>-->
+                  
+                 <!-- <apex:image url="/servlet/servlet.FileDownload?file={!firstFileId}"/> -->
+                 <div class ="profileImg">
+                  <apex:image width="100%" height="100%" url="/wellkept/servlet/servlet.FileDownload?file={!firstFileId}"/>
+                  </div> 
+                  <div class="noProfileImg">
+                    <img src="{!URLFOR($Resource.wkresources, 'img/noProfile.png')}" />
+                  </div> 
+
+
+                </span> {!conName}
+                        <img class="down-arrow" type="image/svg+xml" src="{!URLFOR($Resource.wkresources, 'icons/icn-arrow-down.svg')}" />
+                        </button>
+                        </span>
+                    </div>
+                    <div class="profile-dialog">
+                        <div class="dialog-liner">
+                            <!--  <span class="avatar">
+                     <apex:image url="/servlet/servlet.FileDownload?file={!firstFileId}"/>
+                  </span> -->
+                            <div class="user-details">
+                                <span class="user-full-name">
+                      {!conName}
+                    </span>
+                                <span class="user-email">
+                     {!conEmail}
+                    </span>
+                                <!--<span class="user-emergency-contact">
+                      <a href="#">Emergency Contact @TODO</a>
+                    </span>-->
+                            </div>
+                        </div>
+                        <div data-toggle="modal" data-target=".bs-feedback-modal-lg" class="headerFeedback feedback">
+                            <div>Feedback</div>
+                        </div>
+                        <!--Property names list -->
+                        <div class="propertyBox mt-35">
+                            <div class="property">
+                                <apex:repeat id="accWrap" value="{!listofJsonAccountWrapper}" var="accWrapper">
+                                    <div class="mb-20 proText" id="proText" data-accountid='{!accWrapper.accId}' onClick="accountfunction('{!accWrapper.accId}', event);return false">{!accWrapper.accountName}</div>
+                                </apex:repeat>
+                            </div>
+                        </div>
+                        <span class="logout">
+                  <a href="{!$label.WK_LogoutURL}">
+                    Logout
+                  </a>
+                </span>
+                        <span class="settings">
+                  <a href="{!URLFOR($Page.WK_Profile)}?Id={!accountId}"> 
+                      <img type="image/svg+xml" src="{!URLFOR($Resource.wkresources, 'icons/icn-gear.svg')}" />
+                  </a>  
+                </span>
+                        <span class="settingsForRM">
+         <!--  <a href="{!URLFOR($Page.WK_Profile)}?Id={!accountId}"> -->
+            <img src="{!URLFOR($Resource.wkresources, 'icons/icn-gear.svg')}" type="image/svg+xml" />
+           <!--</a>-->
+         </span>
+                    </div>
+                   <!--  </nav> -->
+                    <!--  </span>  -->
+                    <!-- </div> -->
+
+                    <ul class="navigationLinksRM">
+                        <li class="{!IF($CurrentPage.Name == 'WK_homepage','active','')}">
+                            <!--   <span id= "estimateCost" class="estimate">  </span>  //onclick="callHomePage();return false;" -->
+                            <a> 
+                  Home
+               </a>
+                        </li>
+                        <li class="{!IF($CurrentPage.Name == 'WK_Services','active','')}">
+                            <!--   <span id= "estimateCost" class="estimate">  </span>  //onclick="callHomePage();return false;" -->
+                            <a> 
+                  Services
+               </a>
+                        </li>
+                        <li class="{!IF($CurrentPage.Name == 'WK_reports','active','')}">
+                            <a>
+                  Reports
+                </a>
+                        </li>
+                        <li class="{!IF($CurrentPage.Name == 'WK_Documents','active','')}">
+                            <a>
+                  Documents
+                </a>
+                        </li>
+                        <li class="{!IF(OR($CurrentPage.Name == 'WK_ContactUs',$CurrentPage.Name == 'WK_JunkRemovalPage'),'active','')} pr-25">
+                            <a>
+                  Contact
+                </a>
+                        </li>
+
+                    </ul>
+                    <!-- <nav> -->
+                    <ul class="navigationLinks">
+                        <li class="{!IF($CurrentPage.Name == 'WK_homepage','active','')}">
+                            <!--   <span id= "estimateCost" class="estimate">  </span>  //onclick="callHomePage();return false;" -->
+                            <a href="{!URLFOR($Page.WK_homepage)}?Id={!accountId}"> 
+                  Home
+               </a>
+                        </li>
+                        <li class="{!IF($CurrentPage.Name == 'WK_Services','active','')}">
+
+                            <a href="{!URLFOR($Page.WK_Services)}?Id={!accountId}"> 
+                  Services
+               </a>
+                        </li>
+                        <li class="{!IF($CurrentPage.Name == 'WK_reports','active','')}">
+                            <a href="{!URLFOR($Page.WK_reports)}?Id={!accountId}">
+                  Reports
+                </a>
+                        </li>
+                        <li class="{!IF($CurrentPage.Name == 'WK_Documents','active','')}">
+                            <a href="{!URLFOR($Page.WK_Documents)}?Id={!accountId}">
+                  Documents
+                </a>
+                        </li>
+                        <li class="{!IF(OR($CurrentPage.Name == 'WK_ContactUs',$CurrentPage.Name == 'WK_JunkRemovalPage'),'active','')} pr-25">
+                            <a href="{!URLFOR($Page.WK_ContactUs)}?Id={!accountId}">
+                  Contact
+                </a>
+                        </li>
+
+                    </ul>
+                    </nav>
+                
+                <div class="clearfix"></div>
+            </div>
+        </div>
+
+    </header>
+    <!--header end-->
+    <!-- Start Sub Header -->
+    <div class="header-sub">
+        <div class="header-sub-liner">
+            <div class="container-fluid">
+                <!--   <ul>
+            <li>
+              <a href="home.html">
+                Home
+              </a>
+            </li>
+             <li>
+              <a href="reports.html">
+                Reports
+              </a>
+            </li> 
+          </ul> -->
+
+            </div>
+        </div>
+    </div>
+
+    <div class="waitPopUp">
+        <div><img src="{!URLFOR($Resource.wkresources, 'img/shape.png')}" /></div>
+        <div>
+            <h3>Wait!</h3>
+            <p>
+                You must Choose a property before moving to another tab.
+            </p>
+            <div class="scrollAccount">
+                <apex:repeat id="accWrap2" value="{!listofJsonAccountWrapper}" var="accWrapper">
+                    <div class="mb-20" id="proText" data-accountid='{!accWrapper.accId}' onClick="accountfunction('{!accWrapper.accId}', event);return false">{!accWrapper.accountName}</div>
+                </apex:repeat>
+            </div>
+            <h4 class="noThanks">NO THANKS</h4>
+        </div>
+
+    </div>
+
+
+    <div id="feedbackModal" class="modal fade bs-feedback-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content feedbackModalMob">
+                <div class="section-liner portalfeedSend">
+		// Ashish Defect Fix
+                    <h3 class="feedbackHeader"> Portal Feedback </h3>
+                    <apex:form id="portalfeedback" styleClass="portalfeedback">
+                        <div class="row ml-0">
+                            <section class='rating-widget'>
+                                <!-- Rating Stars Box -->
+                                <div class='rating-stars portalfeed'>
+                                    <span>rate your overall portal experience:
+                                    
+                                         </span>
+
+
+                                    <ul id='stars'>
+                                        <li class='star' title='Poor' data-value='1'>
+                                            <i class='fa fa-star fa-fw'></i>
+                                        </li>
+                                        <li class='star' title='Could be better' data-value='2'>
+                                            <i class='fa fa-star fa-fw'></i>
+                                        </li>
+                                        <li class='star' title='Okay' data-value='3'>
+                                            <i class='fa fa-star fa-fw'></i>
+                                        </li>
+                                        <li class='star' title='Good' data-value='4'>
+                                            <i class='fa fa-star fa-fw'></i>
+                                        </li>
+                                        <li class='star' title='Excellent' data-value='5'>
+                                            <i class='fa fa-star fa-fw'></i>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </section>
+                        </div>
+                        <div class="row ml-0 portalfeed">
+                            <span>What do you like about the portal?</span>
+                            <div class="form-group ">
+                                <textarea class="likePortal portalLike" value="{!likePortal}"></textarea>                               
+
+                            </div>
+
+                        </div>
+
+                        <div class="row ml-0 portalfeed">
+                            <span>What would you like to improve?</span>
+                            <div class="form-group ">
+                                <textarea class="likePortal improvePortal" value="{!improvePortal}"></textarea>
+
+                            </div>
+
+                        </div>
+
+                        <div class="row ml-0 portalfeed">
+                            <span>Include attachment?</span>
+                            <div id="choosefileFeed" class="screenshotFeedback">
+                                <div class="div-only-desk">
+                                    <label for="inquiry-file-img-feedback" class="linktest CHOOSE-FILE "> <img type="image/svg+xml" class="edit-icon pr-5 " src="{!URLFOR($Resource.wkservicesImg, 'mobileImg/ic-upload.png')}"/> CHOOSE FILE</label>
+                                    <input id="inquiry-file-img-feedback" class="inquiry-file-img" type="file" value="" onchange="previewfileFeedback()" />
+                                </div>
+                            </div>
+                            <div id="divuploaderror">
+                                <ul class="parsley-errors-list filled" id="message-Text" style="display:block">
+                                    <li class="parsley-required" id="uploaderror"></li>
+                                </ul>
+                            </div>
+                            <div class="attch-file fileLableFeed" style="display: none">
+                                <div id="uploadedfilenameFeed"></div>
+                            </div>
+
+                        </div>
+
+                        <div class="clearfix"></div>
+                        <!--  <apex:form Id="formId"> -->
+                        <apex:actionFunction name="createCaseActionHD" action="{!portalFeedback}" rerender="portalfeedback" oncomplete="initializeJquery();">
+                            <apex:param name="feedsJSON" assignTo="{!feedsJSON}" value="" />
+                            <apex:param name="ratingPortal" assignTo="{!ratingPortal}" value="" />
+                            <apex:param name="likePortal" assignTo="{!likePortal}" value="" />
+                            <apex:param name="improvePortal" assignTo="{!improvePortal}" value="" />
+                        </apex:actionFunction>
+
+                        <div class="row modal-btns gutter-10">
+                            <div class="col-md-2">
+
+                            </div>
+                            <div class="col-md-4 cancelFeedBack">
+                                <button type="button" class="secondary button-small" ID="mod_cls" data-dismiss="modal" aria-label="Cancel"> Cancel </button>
+                            </div>
+                            <div class="col-md-4 sendFeedback disableSend">
+                                <div id="feedbackSave" class="primary button-small" onclick="openModalJSFeed();return false;"> send
+                                </div>
+                                <!-- <button id="feedbackSave" class="primary button-small"> send </button> -->
+                            </div>
+                            <div class="col-md-2"></div>
+                        </div>
+
+                    </apex:form>
+                </div>
+                <div class="thanksFeed thank-you-modal" style="display: none;">
+                    <div class="section-liner">
+                        <div class="image-block">
+                            <img src="{!URLFOR($Resource.wkresources, 'icons/w-logo.svg')}" type="image/svg+xml" />
+                        </div>
+                        <h3>
+                            {!$Label.WK_thankYou}
+                        </h3>
+                        <div class="row">
+                            <div class="col-xs-12 col-md-12">
+                                <p>
+                                    Your feedback helps us to continuously improve the portal experience.</p>
+                            </div>
+                            <div class="col-xs-3">
+                            </div>
+                            <div class="col-xs-6">
+                                <button class="secondary close" type="button" data-dismiss="modal">
+                                    {!$Label.WK_close}
+                                  </button>
+                            </div>
+                            <div class="col-xs-3">
+                            </div>
+                        </div>
+                    </div>
+
+
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+    <!--    <apex:form id="formId">
+            <apex:actionFunction action="{!navigateToVioRec}" name="navigationAF" rendered="formId">
+            <apex:param name="accName" assignTo="{!accountId}" value="" />
+            </apex:actionFunction>
+        </apex:form>
+    
+    <!-- End Sub Header -->
+</apex:component>
