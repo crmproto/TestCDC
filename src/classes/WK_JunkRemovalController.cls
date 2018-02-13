@@ -5,7 +5,7 @@
 
  * Date:   `25/07/2017
  * Detail: Class to create WorkOrder and WOLI on Portal.
-/******Sucheta's Comments ***********/
+/******Sucheta's Comments Updated ***********/
 *****************************************************************************/
 global without sharing class WK_JunkRemovalController {
 
