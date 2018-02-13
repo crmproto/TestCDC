@@ -7,7 +7,7 @@ Public Class WK_ReportsControllerTest{
     private static ServiceAppointment serviceapp;
 
     /**
-     * @author: NSebastian@Deloitte
+     * @author: NSebastian@Deloitte test
      * @description: Create testdata
      * @param: String selectedType, String duration
      * @returntype:    void
